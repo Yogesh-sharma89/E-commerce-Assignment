@@ -1,0 +1,49 @@
+# ==========================================
+# 🔐 SECURE ENVIRONMENT VARIABLES (CRITICAL)
+# ==========================================
+.env
+.env.local
+.env.*.local
+*.env
+!.env.example # Keep this file trackable as a template blueprint
+
+# ==========================================
+# 🛠️ DEPENDENCY MANAGEMENT & ENGINE LOCKS
+# ==========================================
+node_modules/
+jspm_packages/
+.pnp
+.pnp.js
+
+# ==========================================
+# 🏗️ BACKEND BUILD OUTPUTS & TOOLS
+# ==========================================
+dist/
+build/
+out/
+.drizzle/migrator.json # Exclude internal Drizzle state migrator indicators if present
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+lerna-debug.log*
+
+# ==========================================
+# 📷 MEDIA UPLOADS & FILE CACHES
+# ==========================================
+# Exclude server media uploads if stored dynamically on disk rather than ImageKit
+/uploads/
+/public/uploads/
+
+# ==========================================
+# 💻 SYSTEM & COMPILER SIDE EFFECTS
+# ==========================================
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.swp
