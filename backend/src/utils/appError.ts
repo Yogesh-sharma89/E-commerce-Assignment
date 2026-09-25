@@ -4,7 +4,7 @@ class AppError extends Error {
     public readonly isOperational: boolean;
     public override  readonly name:string;
 
-    constructor(statusCode: number, message: string, status: string = statusCode >= 500 ? "error" : "fail") {
+    constructor(statusCode: number, message: string, status: string = statusCode >= 500 ? "ERROR" : "FAIL") {
 
         super(message);
         

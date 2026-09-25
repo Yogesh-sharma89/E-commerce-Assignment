@@ -10,14 +10,14 @@ const ErrorHandler: ErrorRequestHandler = (
 ) => {
 
     let statusCode = 500;
-    let status = "error";
+    let status = "ERROR";
     let message = "Something went wrong";
 
     //handle error
     if (err instanceof AppError) {
         status = err.status;
         statusCode = err.statusCode;
-        message: err.message
+        message = err.message;
     }
 
     //log the error 
