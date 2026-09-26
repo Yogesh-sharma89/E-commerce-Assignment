@@ -3,12 +3,6 @@ import type { IPRODUCTMEDIA } from "../types/schema/product.js";
 
 const productMediaSchema = new mongoose.Schema<IPRODUCTMEDIA>({
 
-    product:{
-        type:mongoose.Types.ObjectId,
-        required:true,
-        ref:"product",
-        index:true
-    },
 
     url:{
         type:String,

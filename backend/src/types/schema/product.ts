@@ -9,6 +9,7 @@ export interface IPRODUCT extends Document{
         currency:string
     },
     images:IPRODUCTMEDIA[],
+    sku:string //stock keeping unit
     slug:string,
     brand?:string,
     stock:number,

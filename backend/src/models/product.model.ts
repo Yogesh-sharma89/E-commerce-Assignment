@@ -42,6 +42,12 @@ const productSchema = new mongoose.Schema<IPRODUCT>({
         trim: true,
         minlength: [1, "Product slug cannot be empty"]
     },
+    sku:{
+        type:String,
+        required:[true,"Sku is required"],
+        trim:true,
+        min:[1,"product sku can't be empty"]
+    },
 
     images:[productMediaSchema],
 
@@ -69,6 +75,9 @@ const productSchema = new mongoose.Schema<IPRODUCT>({
 }, {
     timestamps: true
 });
+
+productSchema.index({sku:1},{unique:true})
+productSchema.index({slug:1},{unique:true})
 
 const ProductModel = mongoose.model<IPRODUCT>("product", productSchema);
 
