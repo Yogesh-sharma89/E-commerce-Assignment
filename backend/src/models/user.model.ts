@@ -33,6 +33,13 @@ const userSchema = new mongoose.Schema<IUSER>({
         required: [true, "Password is required"]
     },
 
+    role:{
+        type:String,
+        enum:["user","seller"],
+        default:"user",
+        required:true
+    },
+
     profileUrl: {
         type: String,
         default: ""
