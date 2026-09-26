@@ -4,6 +4,7 @@ export interface IUSER extends Document{
     fullname:string,
     email:string,
     password:string,
+    role:string,
     profileUrl:string,
     profilePublicId:string,
 }

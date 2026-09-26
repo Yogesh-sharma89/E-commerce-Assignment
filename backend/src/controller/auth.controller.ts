@@ -48,7 +48,8 @@ export const Register = asyncHandler(async (req, res) => {
     const payload = {
         userId: newUser._id.toString(),
         sessionId: sessionId.toString(),
-        email: newUser.email
+        email: newUser.email,
+        role:newUser.role
     }
 
     //generate refresh token
@@ -138,7 +139,8 @@ export const Login = asyncHandler(async (req, res) => {
     const payload = {
         userId: user._id.toString(),
         sessionId: sessionId.toString(),
-        email: user.email
+        email: user.email,
+        role:user.role
     }
 
     //generate refresh token

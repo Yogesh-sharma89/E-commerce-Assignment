@@ -1,6 +1,7 @@
 import asyncHandler from "../middleware/asyncHandler.js";
 import ProductModel from "../models/product.model.js";
 import AppError from "../utils/appError.js";
+import { productSchema } from "../validations/product.js";
 
 
 export const GetAllproducts = asyncHandler(async(req,res)=>{
@@ -47,7 +48,24 @@ export const GetProductById  = asyncHandler(async(req,res)=>{
 
 export const CreateProduct = asyncHandler(async(req,res)=>{
 
+ const validProductData = productSchema.safeParse(req.body);
 
+ if(!validProductData.success){
+    
+    const message = validProductData.error.issues.map((issue)=>issue.message).join(", ");
+
+    throw new AppError(400,message || "validation failed","FAIL");
+ }
+
+ const productData = validProductData.data;
+
+ const files = req.files as Express.Multer.File[];
+
+ if(!files || files.length===0){
+    throw new AppError(400,"At least 1 image is required to create product","FAIL");
+ }
+
+ 
 
 })
 
