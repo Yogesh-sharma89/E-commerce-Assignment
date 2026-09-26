@@ -2,7 +2,18 @@ import express from "express";
 import cors from "cors";
 import authRouter from "./routes/auth.route.js";
 import ErrorHandler from "./middleware/errorHandler.js";
+import helmet from "helmet";
+import httpLogger from "./middleware/httpLogger.js";
+import cookieParser from "cookie-parser";
+import { globalLimiter } from "./middleware/rate-limit.js";
+
+
 const app = express();
+
+app.use(helmet());
+
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 
 app.use(
   cors({
@@ -11,8 +22,12 @@ app.use(
   })
 );
 
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
+app.use(cookieParser());
+
+app.use(httpLogger);
+
+//rate limiter
+app.use(globalLimiter)
 
 //routes 
 app.use("/api/auth",authRouter);
