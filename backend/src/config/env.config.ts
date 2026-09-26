@@ -11,6 +11,10 @@ const EnvConfig = {
     token:{
         access:process.env.ACCESS_TOKEN_SECRET,
         refresh:process.env.REFRESH_TOKEN_SECRET
+    },
+    imageKit:{
+        privateKey:process.env.IMAGEKIT_PRIVATE_KEY,
+        publicKey:process.env.IMAGEKIT_PUBLIC_KEY
     }
 }
 
