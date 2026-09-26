@@ -13,6 +13,6 @@ export interface ISESSION extends Document{
     refreshTokenHash:string,
     ip:string,
     expiresAt:Date,
-    revokedAt:Date,
+    revokedAt?:Date,
     userAgent?:string 
 }

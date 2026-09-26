@@ -2,7 +2,7 @@ import { z } from "zod";
 
 import { PASSWORD_REGEX , EMAIL_REGEX } from "../constant/regex.js";
 
-const loginSchema = z.object({
+export const loginSchema = z.object({
 
     email: z.string()
         .trim()
