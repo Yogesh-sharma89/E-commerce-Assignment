@@ -3,7 +3,7 @@ import EnvConfig from "../config/env.config.js";
 import AppError from "./appError.js";
 import crypto from 'crypto';
 
-type UserRole = "user" | "seller"
+export type UserRole = "user" | "seller"
 export interface MyJwtPayload {
     userId: string,
     email: string,

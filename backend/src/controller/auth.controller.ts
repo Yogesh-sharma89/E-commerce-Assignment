@@ -6,7 +6,7 @@ import { registerSchema } from "../validations/register.js";
 import bcrypt from "bcryptjs";
 
 import SessionModel from "../models/session.model.js";
-import { GenerateAccessToken, GenerateRefreshToken, HashToken, verifyToken } from "../utils/token.js";
+import { GenerateAccessToken, GenerateRefreshToken, HashToken, verifyToken, type UserRole } from "../utils/token.js";
 import EnvConfig from "../config/env.config.js";
 import { loginSchema } from "../validations/login.js";
 
@@ -49,7 +49,7 @@ export const Register = asyncHandler(async (req, res) => {
         userId: newUser._id.toString(),
         sessionId: sessionId.toString(),
         email: newUser.email,
-        role:newUser.role
+        role:newUser.role as UserRole
     }
 
     //generate refresh token
@@ -140,7 +140,7 @@ export const Login = asyncHandler(async (req, res) => {
         userId: user._id.toString(),
         sessionId: sessionId.toString(),
         email: user.email,
-        role:user.role
+        role:user.role as UserRole
     }
 
     //generate refresh token
