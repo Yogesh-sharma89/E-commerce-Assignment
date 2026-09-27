@@ -37,6 +37,15 @@ export const productSchema = z.strictObject({
     shippingInfo: z.string().trim().min(1).max(2000).optional()
 });
 
+export const updateProductSchema = productSchema
+    .extend({
+        price: productSchema.shape.price.partial(),
+        replaceImageIds:z.array(z.string()).optional()
+    })
+    .partial();
+
 export type ProductCreateInput = z.input<typeof productSchema>;
 
 export type ProductData = z.output<typeof productSchema>;
+
+export type ProductUpdateInput = z.infer<typeof updateProductSchema>;
