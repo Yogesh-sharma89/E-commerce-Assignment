@@ -9,6 +9,8 @@ import SessionModel from "../models/session.model.js";
 import { GenerateAccessToken, GenerateRefreshToken, HashToken, verifyToken, type UserRole } from "../utils/token.js";
 import EnvConfig from "../config/env.config.js";
 import { loginSchema } from "../validations/login.js";
+import UploadImage from "../utils/uploadImage.js";
+import DeleteImage from "../utils/deleteImage.js";
 
 export const Register = asyncHandler(async (req, res) => {
 
@@ -23,7 +25,7 @@ export const Register = asyncHandler(async (req, res) => {
         throw new AppError(400, message || "Validation failed", "FAIL");
     }
 
-    const { fullname, email, password,role } = validatedData.data;
+    const { fullname, email, password, role } = validatedData.data;
 
     //check if user exists 
 
@@ -50,7 +52,7 @@ export const Register = asyncHandler(async (req, res) => {
         userId: newUser._id.toString(),
         sessionId: sessionId.toString(),
         email: newUser.email,
-        role:newUser.role as UserRole
+        role: newUser.role as UserRole
     }
 
     //generate refresh token
@@ -141,7 +143,7 @@ export const Login = asyncHandler(async (req, res) => {
         userId: user._id.toString(),
         sessionId: sessionId.toString(),
         email: user.email,
-        role:user.role as UserRole
+        role: user.role as UserRole
     }
 
     //generate refresh token
@@ -156,7 +158,7 @@ export const Login = asyncHandler(async (req, res) => {
         _id: sessionId,
         user: user._id,
         refreshTokenHash,
-        ip:req.ip ?? "unknown",
+        ip: req.ip ?? "unknown",
         expiresAt: new Date(Date.now() + REFRESH_TOKEN_EXPIRES),
         userAgent: req.headers["user-agent"] ?? "unknown",
     })
@@ -273,17 +275,17 @@ export const RefreshSession = asyncHandler(async (req, res) => {
         maxAge: 20 * 60 * 1000
     }
 
-    res.cookie("accessToken", newAccessToken,{
-      ...cookieOptions
+    res.cookie("accessToken", newAccessToken, {
+        ...cookieOptions
     })
 
-    res.cookie("refreshToken",newRefreshToken,{
-        ...cookieOptions,maxAge:7*24*60*60*1000
+    res.cookie("refreshToken", newRefreshToken, {
+        ...cookieOptions, maxAge: 7 * 24 * 60 * 60 * 1000
     })
 
     return res.status(200).json({
-        success:true,
-        message:"Token refreshed successfully",
+        success: true,
+        message: "Token refreshed successfully",
     })
 
 
@@ -306,12 +308,81 @@ export const GetCurrentUser = asyncHandler(async (req, res) => {
                 email: user?.email,
                 name: user?.fullname,
                 profileUrl: user?.profileUrl,
-                role: user?.role
+                role: user?.role,
+                createdAt: user?.createdAt?.toISOString()
             }
         }
     })
 
 })
+
+export const UpdateProfileAvatar = asyncHandler(async (req, res) => {
+
+    const userId = req.user?.userId;
+    const file = req.file;
+
+    if (!userId) {
+        throw new AppError(401, "Authentication required", "FAIL");
+    }
+    if (!file) {
+        throw new AppError(400, "Select an image to upload", "FAIL");
+    }
+
+    const user = await UserModel.findById(userId);
+    if (!user) {
+        throw new AppError(404, "User doesn't exist", "FAIL");
+    }
+
+    const oldPublicId = user.profilePublicId;
+
+    const uploadedAvatar = await UploadImage(file, "/profiles");
+
+    const avatarUrl = uploadedAvatar.url;
+
+
+    const avatarPublicId = uploadedAvatar.publicId;
+
+    if (!avatarUrl || !avatarPublicId) {
+        if (avatarPublicId) {
+            await DeleteImage(avatarPublicId).catch((deleteError) => {
+                console.error("Failed to clean up an invalid profile upload:", deleteError);
+            });
+        }
+        throw new AppError(502, "Profile image upload did not return a valid image", "FAIL");
+    }
+
+    try {
+        user.profileUrl = avatarUrl;
+        user.profilePublicId = avatarPublicId;
+        await user.save();
+    } catch (error) {
+        await DeleteImage(avatarPublicId).catch((deleteError) => {
+            console.error("Failed to clean up an unsuccessful profile upload:", deleteError);
+        });
+        throw error;
+    }
+
+    if (oldPublicId && oldPublicId !== avatarPublicId) {
+        void DeleteImage(oldPublicId).catch((error) => {
+            console.error("Failed to delete the previous profile image:", error);
+        });
+    }
+
+    return res.status(200).json({
+        success: true,
+        message: "Profile image updated successfully",
+        data: {
+            user: {
+                id: user._id,
+                name: user.fullname,
+                email: user.email,
+                role: user.role,
+                profileUrl: user.profileUrl,
+                createdAt: user.createdAt?.toISOString()
+            },
+        },
+    });
+});
 
 export const Logout = asyncHandler(async (req, res) => {
 
@@ -321,17 +392,17 @@ export const Logout = asyncHandler(async (req, res) => {
 
     const user = await UserModel.findById(currentUser?.userId).lean();
 
-    if(!user){
-        throw new AppError(404,"User doesn't exists","FAIL")
+    if (!user) {
+        throw new AppError(404, "User doesn't exists", "FAIL")
     }
 
     //find the session 
     const session = await SessionModel.findById(currentUser.sessionId).lean();
 
-    if(session){
+    if (session) {
 
         //then delete It 
-        await SessionModel.deleteOne({_id:session._id});
+        await SessionModel.deleteOne({ _id: session._id });
     }
 
     //otherwise logout would have happen
@@ -339,8 +410,8 @@ export const Logout = asyncHandler(async (req, res) => {
     res.clearCookie("refreshToken");
 
     return res.status(200).json({
-        success:true,
-        message:"User logged out successfully"
+        success: true,
+        message: "User logged out successfully"
     })
 
 })

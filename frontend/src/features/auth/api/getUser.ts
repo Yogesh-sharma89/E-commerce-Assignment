@@ -1,11 +1,12 @@
 import { api } from "../../../service/api"
 
-interface CurrentUser {
+export interface CurrentUser {
     id: string;
     name: string;
     email: string;
     profileUrl?: string;
     role: "user" | "seller";
+    createdAt?: string;
 }
 
 interface GetCurrentUserResponse {

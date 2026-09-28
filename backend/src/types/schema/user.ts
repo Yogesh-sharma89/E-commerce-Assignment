@@ -7,6 +7,8 @@ export interface IUSER extends Document{
     role:string,
     profileUrl:string,
     profilePublicId:string,
+    createdAt?:Date,
+    updatedAt?:Date,
 }
 
 export interface ISESSION extends Document{
