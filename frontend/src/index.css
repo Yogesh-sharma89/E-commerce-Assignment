@@ -1,8 +1,10 @@
 @import "tailwindcss";
 
 @theme {
-  --font-sans: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-  --font-mono: 'JetBrains Mono', monospace;
+  --font-sans:
+    "Plus Jakarta Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+    sans-serif;
+  --font-mono: "JetBrains Mono", monospace;
 }
 
 body {
@@ -30,226 +32,65 @@ body {
   background: #3b3e4a;
 }
 
+/* Sonner owns toast layout and interaction; customize its theme tokens only. */
+[data-sonner-toaster] {
+  --normal-bg: #1f1f1f;
+  --normal-text: #e2e4e9;
+  --normal-border: #303036;
+}
 
-
-
-/* =========================================
-   SONNER TOAST
-   ========================================= */
-
-[data-sonner-toast] {
-  width: min(420px, calc(100vw - 32px)) !important;
-
-  min-height: 64px !important;
-
-  padding: 14px 44px 14px 14px !important;
-
-  display: flex !important;
-  align-items: center !important;
-
-  gap: 12px !important;
-
-  background: #1f1f1f !important;
-  color: #e2e4e9 !important;
-
-  border: 1px solid #303036 !important;
-  border-radius: 10px !important;
-
+[data-sonner-toast].shopflow-toast {
+  border-radius: 10px;
   box-shadow:
     0 10px 30px rgba(0, 0, 0, 0.35),
-    0 2px 8px rgba(0, 0, 0, 0.2) !important;
-
-  font-family:
-    'Plus Jakarta Sans',
-    -apple-system,
-    BlinkMacSystemFont,
-    'Segoe UI',
-    Roboto,
-    sans-serif !important;
+    0 2px 8px rgba(0, 0, 0, 0.2);
+  font-family: var(--font-sans, system-ui, sans-serif);
 }
 
-
-/* =========================================
-   ICON
-   ========================================= */
-
-[data-sonner-toast] [data-icon] {
-  width: 20px !important;
-  height: 20px !important;
-
-  flex: 0 0 20px !important;
-
-  display: flex !important;
-  align-items: center !important;
-  justify-content: center !important;
-
-  margin: 0 !important;
+[data-sonner-toast].shopflow-toast [data-title] {
+  color: #f1f2f4;
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 20px;
 }
 
-
-/* =========================================
-   CONTENT
-   ========================================= */
-
-[data-sonner-toast] [data-content] {
-  min-width: 0 !important;
-
-  flex: 1 1 auto !important;
-
-  display: flex !important;
-  flex-direction: column !important;
-
-  justify-content: center !important;
-
-  gap: 2px !important;
-
-  margin: 0 !important;
+[data-sonner-toast].shopflow-toast [data-description] {
+  color: #9b9da5;
+  font-size: 12px;
+  line-height: 18px;
 }
 
-
-/* =========================================
-   TITLE
-   ========================================= */
-
-[data-sonner-toast] [data-title] {
-  margin: 0 !important;
-
-  color: #f1f2f4 !important;
-
-  font-size: 14px !important;
-  font-weight: 600 !important;
-
-  line-height: 20px !important;
-
-  letter-spacing: -0.01em !important;
+[data-sonner-toast].shopflow-toast[data-type="success"] {
+  border-color: rgba(77, 171, 154, 0.45);
 }
 
-
-/* =========================================
-   DESCRIPTION
-   ========================================= */
-
-[data-sonner-toast] [data-description] {
-  margin: 0 !important;
-
-  color: #9b9da5 !important;
-
-  font-size: 12px !important;
-
-  line-height: 18px !important;
+[data-sonner-toast].shopflow-toast[data-type="success"] [data-icon] {
+  color: #4dab9a;
 }
 
-
-/* =========================================
-   CLOSE BUTTON
-   ========================================= */
-
-[data-sonner-toast] [data-close-button] {
-  position: absolute !important;
-
-  top: 50% !important;
-  right: 12px !important;
-
-  transform: translateY(-50%) !important;
-
-  width: 24px !important;
-  height: 24px !important;
-
-  margin: 0 !important;
-  padding: 0 !important;
-
-  display: flex !important;
-  align-items: center !important;
-  justify-content: center !important;
-
-  color: #8b8d96 !important;
-
-  background: transparent !important;
-
-  border: 1px solid transparent !important;
-  border-radius: 6px !important;
-
-  cursor: pointer !important;
-
-  transition:
-    background-color 150ms ease,
-    color 150ms ease,
-    border-color 150ms ease !important;
+[data-sonner-toast].shopflow-toast[data-type="error"] {
+  border-color: rgba(225, 98, 89, 0.5);
 }
 
-[data-sonner-toast] [data-close-button]:hover {
-  color: #f1f2f4 !important;
-
-  background: #292a30 !important;
-
-  border-color: #383940 !important;
+[data-sonner-toast].shopflow-toast[data-type="error"] [data-icon] {
+  color: #e16259;
 }
 
-
-/* =========================================
-   SUCCESS
-   ========================================= */
-
-[data-sonner-toast][data-type='success'] {
-  border-color: rgba(77, 171, 154, 0.35) !important;
+[data-sonner-toast].shopflow-toast[data-type="warning"] {
+  border-color: rgba(203, 145, 47, 0.5);
 }
 
-[data-sonner-toast][data-type='success'] [data-icon] {
-  color: #4dab9a !important;
+[data-sonner-toast].shopflow-toast[data-type="warning"] [data-icon] {
+  color: #cb912f;
 }
 
-
-/* =========================================
-   ERROR
-   ========================================= */
-
-[data-sonner-toast][data-type='error'] {
-  border-color: rgba(225, 98, 89, 0.35) !important;
+[data-sonner-toast].shopflow-toast[data-type="info"] [data-icon] {
+  color: #529cca;
 }
 
-[data-sonner-toast][data-type='error'] [data-icon] {
-  color: #e16259 !important;
+[data-sonner-toast].shopflow-toast[data-type="loading"] [data-icon] {
+  color: #8b7cff;
 }
-
-
-/* =========================================
-   WARNING
-   ========================================= */
-
-[data-sonner-toast][data-type='warning'] {
-  border-color: rgba(203, 145, 47, 0.35) !important;
-}
-
-[data-sonner-toast][data-type='warning'] [data-icon] {
-  color: #cb912f !important;
-}
-
-
-/* =========================================
-   INFO
-   ========================================= */
-
-[data-sonner-toast][data-type='info'] {
-  border-color: rgba(82, 156, 202, 0.35) !important;
-}
-
-[data-sonner-toast][data-type='info'] [data-icon] {
-  color: #529cca !important;
-}
-
-
-/* =========================================
-   LOADING
-   ========================================= */
-
-[data-sonner-toast][data-type='loading'] [data-icon] {
-  color: #8b7cff !important;
-}
-
-
-/* =========================================
-   SPINNER
-   ========================================= */
 
 .toast-spinner {
   animation: toast-spin 0.8s linear infinite;
@@ -260,61 +101,6 @@ body {
     transform: rotate(360deg);
   }
 }
-
-
-/* =========================================
-   ACTION / CANCEL BUTTON
-   ========================================= */
-
-[data-sonner-toast] [data-button] {
-  flex-shrink: 0 !important;
-
-  height: 28px !important;
-
-  padding: 0 12px !important;
-
-  margin: 0 !important;
-
-  border: none !important;
-  border-radius: 6px !important;
-
-  background: #8b7cff !important;
-
-  color: #ffffff !important;
-
-  font-size: 12px !important;
-  font-weight: 500 !important;
-
-  cursor: pointer !important;
-
-  transition:
-    background-color 150ms ease,
-    transform 150ms ease !important;
-}
-
-[data-sonner-toast] [data-button]:hover {
-  background: #7969f5 !important;
-}
-
-[data-sonner-toast] [data-button]:active {
-  background: #6c5ce7 !important;
-
-  transform: scale(0.98) !important;
-}
-
-
-/* =========================================
-   MOBILE
-   ========================================= */
-
-@media (max-width: 640px) {
-  [data-sonner-toast] {
-    width: calc(100vw - 24px) !important;
-
-    padding-right: 42px !important;
-  }
-}
-
 
 @keyframes loader-fade {
   from {

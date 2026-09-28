@@ -10,12 +10,14 @@ import {
 export function ToastContainer() {
   return (
     <Toaster
+      theme="dark"
       position="top-right"
       expand={false}
       richColors={false}
       closeButton
       duration={4000}
       visibleToasts={5}
+      toastOptions={{ className: "shopflow-toast" }}
       icons={{
         success: <CheckCircle2 size={18} />,
         error: <XCircle size={18} />,
