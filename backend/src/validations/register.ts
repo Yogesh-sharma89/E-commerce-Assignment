@@ -16,7 +16,8 @@ export const registerSchema = z.object({
         .max(64, "Password must not exceed 64 characters")
         .regex(PASSWORD_REGEX, "Password must include uppercase, lowercase, number, and special character"),
     profileUrl: z.string().default(""),
-    profilePublicId: z.string().default("")
+    profilePublicId: z.string().default(""),
+    role:z.enum(["user","seller"]).default("user")
 });
 
 export type RegisterSchemaType = z.infer<typeof registerSchema>;

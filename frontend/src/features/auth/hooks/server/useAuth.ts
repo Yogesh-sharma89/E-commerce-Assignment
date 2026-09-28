@@ -33,6 +33,7 @@ export const useLoginMutation = () => {
             queryclient.invalidateQueries({
                 queryKey: ['user']
             })
+
         }
     })
 }
@@ -46,9 +47,7 @@ export const useLogoutMutation = () => {
         mutationKey: ['logout'],
         mutationFn: logoutApi,
         onSuccess: () => {
-            queryclient.invalidateQueries({
-                queryKey: ['user']
-            })
+            queryclient.setQueryData(["user"],null);
         }
     })
 }
@@ -58,6 +57,14 @@ export const useGetUser = () => {
 
     return useQuery({
         queryKey: ['user'],
-        queryFn: getUserApi
+        queryFn: getUserApi,
+        retry:false,
+
+        staleTime: 5 * 60 * 1000, // 5 minutes of "fresh" data
+        gcTime: 15 * 60 * 1000,   // Keep in cache for 15 minutes if unmounted
+
+        refetchOnWindowFocus: false, // Don't spam the API on tab switch
+        refetchOnReconnect: true,
+
     })
 }

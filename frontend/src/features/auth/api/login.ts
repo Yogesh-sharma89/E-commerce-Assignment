@@ -13,7 +13,7 @@ const loginApi = async (data:loginData) => {
     }
 
     try {
-        const res = await api.post("/auth/login", { data });
+        const res = await api.post("/auth/login",  data );
         console.log(res.data?.data.user)
 
         return res.data?.data.user;

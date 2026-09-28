@@ -30,7 +30,7 @@ export const productSchema = z.strictObject({
     stock: z.coerce.number()
         .int("Stock must be a whole number")
         .nonnegative("Stock cannot be negative"),
-    isActive: z.string().transform((value)=>value==="true"),
+    isActive: z.string().transform((value) => value === "true"),
     category: z.string().trim().min(1).max(120).optional(),
     features: z.string().trim().min(1).max(2000).optional(),
     returnPolicy: z.string().trim().min(1).max(2000).optional(),
@@ -40,7 +40,8 @@ export const productSchema = z.strictObject({
 export const updateProductSchema = productSchema
     .extend({
         price: productSchema.shape.price.partial(),
-        replaceImageIds:z.array(z.string()).optional()
+        replaceImageIds: z.array(z.string()).optional(),
+        removeImageIds: z.array(z.string()).optional()
     })
     .partial();
 

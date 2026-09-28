@@ -1,14 +1,32 @@
 import { api } from "../../../service/api"
 
-const getUserApi  = async()=>{
+interface CurrentUser {
+    id: string;
+    name: string;
+    email: string;
+    profileUrl?: string;
+    role: "user" | "seller";
+}
 
-    try{
-        const res = await api.get("/auth/me");
-        return res.data;
+interface GetCurrentUserResponse {
+    success: boolean;
+    message: string;
+    data: {
+        user: CurrentUser;
+    };
+}
 
-    }catch(err){
-     console.log("error in get user api : ",err)
-     throw err;
+const getUserApi = async (): Promise<CurrentUser> => {
+
+    console.log("🔥🔥 AUTH ME REQUEST");
+
+    try {
+        const res = await api.get<GetCurrentUserResponse>("/auth/me");
+        return res.data.data.user;
+
+    } catch (err) {
+        console.log("error in get user api : ", err)
+        throw err;
     }
 }
 

@@ -3,7 +3,8 @@ import { api } from "../../../service/api";
 interface RegisterApiData{
     fullname:string,
     email:string,
-    password:string
+    password:string,
+    role:string
 }
 
 const registerApi = async(data:RegisterApiData)=>{
@@ -15,7 +16,7 @@ const registerApi = async(data:RegisterApiData)=>{
 
     try{
 
-        const res = await api.post("/auth/register",{data});
+        const res = await api.post("/auth/register",data);
 
         console.log(res.data?.data.user)
 
