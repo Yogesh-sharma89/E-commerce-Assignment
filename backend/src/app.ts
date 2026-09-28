@@ -6,7 +6,13 @@ import helmet from "helmet";
 import httpLogger from "./middleware/httpLogger.js";
 import cookieParser from "cookie-parser";
 import productRouter from "./routes/product.route.js";
+import { fileURLToPath } from "url";
+import path from "path";
+import EnvConfig from "./config/env.config.js";
 
+
+const  _filename  = fileURLToPath(import.meta.url) ;
+const _dirname = path.dirname(_filename);
 
 const app = express();
 
@@ -16,13 +22,14 @@ app.use(helmet());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-
-app.use(
-  cors({
-    origin: "http://localhost:5173",
-    credentials: true
-  })
-);
+if(EnvConfig.environment!=='production'){
+  app.use(
+    cors({
+      origin: "http://localhost:5173",
+      credentials: true
+    })
+  );
+}
 
 //cookie-parser 
 app.use(cookieParser());
@@ -32,14 +39,9 @@ app.use(cookieParser());
 app.use(httpLogger);
 
 
-//rate limiter
-// app.use(globalLimiter)
-
-
 //routes 
 app.use("/api/auth",authRouter);
 app.use("/api/products",productRouter);
-
 
 
 app.get("/api/health", (_req, res) => {
@@ -48,6 +50,25 @@ app.get("/api/health", (_req, res) => {
     message: "API is running 🚀"
   });
 });
+
+//Fronted server 
+const frontendPath = path.resolve(_dirname,"../../frontend/dist")
+
+app.use(express.static(frontendPath));
+
+
+app.use((req,res,next)=>{
+
+  if(req.method!=="GET"){
+     return next();
+  }
+
+  if(req.path.startsWith("/api")){
+    return next();
+  }
+
+  res.sendFile(path.join(frontendPath,"index.html"))
+})
 
 
 //Error-Handler 
