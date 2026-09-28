@@ -24,6 +24,7 @@ app.use(helmet({
         "'self'",
         "data:",
         "https://ik.imagekit.io",
+         "blob:"
       ]
     }
   }
