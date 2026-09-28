@@ -5,8 +5,8 @@ import { loginLimit, registerLimit } from "../middleware/rate-limit.js";
 
 const authRouter = Router();
 
-authRouter.post("/register",registerLimit,Register)
-authRouter.post("/login",loginLimit,Login)
+authRouter.post("/register",Register)
+authRouter.post("/login",Login)
 authRouter.post("/refresh-token",RefreshSession)
 
 //Authenticated routes

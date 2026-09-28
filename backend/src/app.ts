@@ -34,7 +34,7 @@ app.use(httpLogger);
 
 
 //rate limiter
-app.use(globalLimiter)
+// app.use(globalLimiter)
 
 
 //routes 

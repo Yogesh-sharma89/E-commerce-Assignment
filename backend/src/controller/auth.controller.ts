@@ -23,7 +23,7 @@ export const Register = asyncHandler(async (req, res) => {
         throw new AppError(400, message || "Validation failed", "FAIL");
     }
 
-    const { fullname, email, password } = validatedData.data;
+    const { fullname, email, password,role } = validatedData.data;
 
     //check if user exists 
 
@@ -39,7 +39,8 @@ export const Register = asyncHandler(async (req, res) => {
     const newUser = await UserModel.create({
         fullname,
         email,
-        password: passwordHash
+        password: passwordHash,
+        role
     })
 
     //now create the user session 
@@ -97,7 +98,7 @@ export const Register = asyncHandler(async (req, res) => {
                 id: newUser._id,
                 name: newUser.fullname,
                 email: newUser.email,
-                profileUrl: newUser.profileUrl
+                profileUrl: newUser.profileUrl,
             }
         }
     })
@@ -304,7 +305,8 @@ export const GetCurrentUser = asyncHandler(async (req, res) => {
                 id: user?._id,
                 email: user?.email,
                 name: user?.fullname,
-                profileUrl: user?.profileUrl
+                profileUrl: user?.profileUrl,
+                role: user?.role
             }
         }
     })

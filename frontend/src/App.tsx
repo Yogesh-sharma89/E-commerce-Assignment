@@ -1,16 +1,17 @@
+
+import AppProvider from "./provider/AppProvider";
+import { Provider } from "react-redux";
+import { store } from "./store";
+
+
+
 function App() {
   return (
-    <main className="flex min-h-screen items-center justify-center">
-      <div className="text-center">
-        <h1 className="text-4xl font-bold">
-          🚀 Yogesh Stack
-        </h1>
-
-        <p className="mt-3 text-gray-500">
-          Your project is ready.
-        </p>
-      </div>
-    </main>
+    <>
+    <Provider store={store}>
+         <AppProvider/>
+    </Provider>
+    </>
   );
 }
 

@@ -12,7 +12,7 @@ import { productSchema, updateProductSchema } from "../validations/product.js";
 
 export const GetAllproducts = asyncHandler(async (_req, res) => {
 
-    const products = await ProductModel.find().sort({ createdAt: -1, _id: -1 }).lean();
+    const products = await ProductModel.find({ isActive: true }).sort({ createdAt: -1, _id: -1 }).lean();
 
     return res.status(200).json({
         success: true,
@@ -168,6 +168,9 @@ export const UpdateProduct = asyncHandler(async (req, res) => {
         }),
         ...(req.body.replaceImageIds && {
             replaceImageIds: JSON.parse(req.body.replaceImageIds)
+        }),
+        ...(req.body.removeImageIds && {
+            removeImageIds: JSON.parse(req.body.removeImageIds)
         })
     }
 
@@ -178,7 +181,12 @@ export const UpdateProduct = asyncHandler(async (req, res) => {
         throw new AppError(400, message || "Validation failed", "FAIL");
     }
 
-    const {images,replaceImageIds:replaceImageIds_s,...productData} = validProductData.data;
+    const {
+        images,
+        replaceImageIds: replaceImageIds_s,
+        removeImageIds: removeImageIds_s,
+        ...productData
+    } = validProductData.data;
 
     //find the product 
     const product = await ProductModel.findById(validProductId);
@@ -187,89 +195,71 @@ export const UpdateProduct = asyncHandler(async (req, res) => {
         throw new AppError(404, "Product doesn't exists", "FAIL")
     }
 
-    const files = req.files as Express.Multer.File[];
-
+    const files = (req.files as Express.Multer.File[] | undefined) ?? [];
     const replaceImageIds = replaceImageIds_s ?? [];
+    const removeImageIds = removeImageIds_s ?? [];
 
+    if (files.length !== replaceImageIds.length) {
+        throw new AppError(400, "Each replacement image must have a matching image Id", "FAIL");
+    }
 
-    //If file exists then only upload them 
-    if (files && files.length > 0) {
+    const uniqueTargetIds = new Set([...replaceImageIds, ...removeImageIds]);
+    if (uniqueTargetIds.size !== replaceImageIds.length + removeImageIds.length) {
+        throw new AppError(400, "Image Ids must be unique and cannot be both replaced and removed", "FAIL");
+    }
 
-        if (files.length !== replaceImageIds.length) {
-            throw new AppError(400, "Invalid product update request", "FAIL")
+    const requestedImageIds = [...replaceImageIds, ...removeImageIds];
+    for (const publicId of requestedImageIds) {
+        const isImageExists = product.images.some((img) => img.publicId?.toString() === publicId);
+        if (!isImageExists) {
+            throw new AppError(400, `Image with Id:${publicId} not found for this product`, "FAIL");
+        }
+    }
+
+    const uploadRes = await Promise.all(files.map(UploadImage));
+    const previousImageIds = [...replaceImageIds, ...removeImageIds];
+
+    replaceImageIds.forEach((publicId, index) => {
+        const existingImage = product.images.find((img) => img.publicId === publicId);
+        const uploadedImage = uploadRes[index];
+
+        if (!existingImage || !uploadedImage?.url || !uploadedImage.type) {
+            throw new AppError(400, "Invalid product image replacement", "FAIL");
         }
 
-        //First validate that all files exists or not
-        for (const publicId of replaceImageIds) {
-            const isImageExists = product.images.some((img) => img.publicId?.toString() === publicId);
+        existingImage.url = uploadedImage.url;
+        existingImage.type = uploadedImage.type;
+        if (uploadedImage.publicId !== undefined) existingImage.publicId = uploadedImage.publicId;
+        if (uploadedImage.thumbnailUrl !== undefined) existingImage.thumbnailUrl = uploadedImage.thumbnailUrl;
+    });
 
-            if (!isImageExists) {
-                throw new AppError(400, `Image with Id :${publicId} not found for this product`, "FAIL")
-            }
-        }
+    if (removeImageIds.length > 0) {
+        const removedIds = new Set(removeImageIds);
+        product.images = product.images.filter((image) => !removedIds.has(image.publicId ?? ""));
+    }
 
-        //2. Uploads all files
-
-        const uploadRes = await Promise.all(
-            files.map(async (file, _index) => {
-
-                //upload
-                const result = await UploadImage(file);
-
-                return result;
-            })
-        )
-
-        replaceImageIds.forEach((publicId, index) => {
-
-            const imgIndex = product.images.findIndex((img) => img.publicId === publicId);
-            const uploadedImage = uploadRes[index];
-            const existingImage = imgIndex === -1 ? undefined : product.images[imgIndex];
-
-            if (!existingImage || !uploadedImage?.url || !uploadedImage.type) {
-                throw new AppError(400, "Invalid product image replacement", "FAIL");
-            }
-
-            existingImage.url = uploadedImage.url;
-            existingImage.type = uploadedImage.type;
-            if (uploadedImage.publicId !== undefined) {
-                existingImage.publicId = uploadedImage.publicId;
-            }
-            if (uploadedImage.thumbnailUrl !== undefined) {
-                existingImage.thumbnailUrl = uploadedImage.thumbnailUrl;
-            }
-        })
-
+    if (files.length > 0 || removeImageIds.length > 0) {
         await product.save();
 
-        //now delete the old files
-        Promise.allSettled(
-            replaceImageIds.map((imageId)=>DeleteImage(imageId))
-        ).then((results)=>{
-
-            const failed = results.filter((result)=>result.status==="rejected");
-
-            if(failed.length>0){
-                console.log("failed to delete old images :", failed);
-            }
-        })
-
+        const deletionResults = await Promise.allSettled(previousImageIds.map(DeleteImage));
+        const failedDeletes = deletionResults.filter((result) => result.status === "rejected");
+        if (failedDeletes.length > 0) console.log("Failed to delete replaced/removed images:", failedDeletes);
     }
 
     const updatedProduct = await ProductModel.findByIdAndUpdate(productId,
-        {$set:productData},
+        { $set: productData },
         {
-            runValidators:true,
-            returnDocument:"after"
+            runValidators: true,
+            returnDocument: "after"
         }
     )
 
-    
+
     return res.status(200).json({
-        success:true,
-        message:"Product updated successfully",
-        data:{
-            product:updatedProduct
+        success: true,
+        message: "Product updated successfully",
+        data: {
+            product: updatedProduct
         }
     })
 })

@@ -1,10 +1,12 @@
+import { AuthLayout } from "../../Layout/AuthLayout"
+import SignupForm from "../components/SignupForm"
 
 
 const Signup = () => {
   return (
-    <div>
-      
-    </div>
+    <AuthLayout >
+       <SignupForm/>
+    </AuthLayout>
   )
 }
 

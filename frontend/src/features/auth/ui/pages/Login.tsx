@@ -1,11 +1,26 @@
 
+import { AuthLayout } from "../../Layout/AuthLayout";
+import LoginForm from "../components/LoginForm";
 
-const Login = () => {
-  return (
-    <div>
-      
-    </div>
+
+const LoginPage = () => {
+
+
+
+  const handleGoogleSignIn = () => {
+    // Kick off your OAuth flow here
+    console.log("continue with Google");
+  };
+   
+  return(
+    
+      <AuthLayout>
+        <LoginForm  />
+      </AuthLayout>
+   
   )
-}
 
-export default Login
+ 
+};
+
+export default LoginPage;

@@ -16,9 +16,6 @@ export function ToastContainer() {
       closeButton
       duration={4000}
       visibleToasts={5}
-      toastOptions={{
-        className: "app-toast",
-      }}
       icons={{
         success: <CheckCircle2 size={18} />,
         error: <XCircle size={18} />,
