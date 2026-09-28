@@ -5,7 +5,6 @@ import ErrorHandler from "./middleware/errorHandler.js";
 import helmet from "helmet";
 import httpLogger from "./middleware/httpLogger.js";
 import cookieParser from "cookie-parser";
-import { globalLimiter } from "./middleware/rate-limit.js";
 import productRouter from "./routes/product.route.js";
 
 
