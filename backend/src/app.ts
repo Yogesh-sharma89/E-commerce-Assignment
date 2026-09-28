@@ -21,6 +21,11 @@ app.use(helmet({
   contentSecurityPolicy:false
 }));
 
+app.use((_req, res, next) => {
+  res.removeHeader("Content-Security-Policy");
+  next();
+});
+
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
