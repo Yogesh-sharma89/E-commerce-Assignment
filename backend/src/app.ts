@@ -18,13 +18,13 @@ const app = express();
 
 
 app.use(helmet({
-  contentSecurityPolicy:false
+  contentSecurityPolicy: {
+    directives: {
+      ...helmet.contentSecurityPolicy.getDefaultDirectives(),
+      "img-src": ["'self'", "data:", "blob:", "https://ik.imagekit.io"],
+    },
+  },
 }));
-
-app.use((_req, res, next) => {
-  res.removeHeader("Content-Security-Policy");
-  next();
-});
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
