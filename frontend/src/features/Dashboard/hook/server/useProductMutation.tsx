@@ -30,9 +30,9 @@ export const useUpdateProduct = () => {
     mutationKey: ["edit-product"],
     mutationFn: ({ productId, values }: UpdateProductVariables) =>
       editProductApi(productId, values),
-    onSuccess: (_data,variables) => {
-      queryClient.invalidateQueries({
-        queryKey: ['product',variables.productId],
+    onSuccess: () => {
+       queryClient.invalidateQueries({
+        queryKey: ["all-products"],
       });
     },
   });
