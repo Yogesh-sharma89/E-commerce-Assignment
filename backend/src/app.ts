@@ -18,16 +18,7 @@ const app = express();
 
 
 app.use(helmet({
-  contentSecurityPolicy: {
-    directives: {
-      imgSrc: [
-        "'self'",
-        "data:",
-        "blob:",
-        "https://ik.imagekit.io",
-      ]
-    }
-  }
+  contentSecurityPolicy:false
 }));
 
 app.use(express.json());
