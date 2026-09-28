@@ -23,8 +23,8 @@ app.use(helmet({
       imgSrc: [
         "'self'",
         "data:",
+        "blob:",
         "https://ik.imagekit.io",
-         "blob:"
       ]
     }
   }
