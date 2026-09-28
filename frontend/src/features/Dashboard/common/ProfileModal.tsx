@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   X,
@@ -8,15 +8,20 @@ import {
   Calendar,
   LogOut,
   CheckCircle2,
+  ImagePlus,
 } from "lucide-react";
 import { useNavigate } from "react-router";
-import { useLogoutMutation } from "../../auth/hooks/server/useAuth.ts";
+import {
+  useLogoutMutation,
+  useUpdateProfileAvatar,
+} from "../../auth/hooks/server/useAuth.ts";
+import type { CurrentUser } from "../../auth/api/getUser.ts";
 import { toast } from "sonner";
 
 export interface ProfileModalProps {
   isOpen: boolean;
   onClose: () => void;
-  user: any;
+  user: (CurrentUser & { memberSince?: string }) | undefined;
 }
 
 const ProfileModal: React.FC<ProfileModalProps> = ({
@@ -25,8 +30,39 @@ const ProfileModal: React.FC<ProfileModalProps> = ({
   user,
 }) => {
   const navigate = useNavigate();
+  const avatarInputRef = useRef<HTMLInputElement>(null);
 
   const { mutateAsync: logout, isPending } = useLogoutMutation();
+  const { mutateAsync: updateProfileAvatar, isPending: isAvatarUploading } =
+    useUpdateProfileAvatar();
+  const isBusy = isPending || isAvatarUploading;
+
+  const handleAvatarSelected = async (
+    event: React.ChangeEvent<HTMLInputElement>,
+  ) => {
+    const file = event.currentTarget.files?.[0];
+    event.currentTarget.value = "";
+    if (!file) return;
+
+    if (!file.type.startsWith("image/")) {
+      toast.error("Choose an image file");
+      return;
+    }
+    if (file.size > 5 * 1024 * 1024) {
+      toast.error("Image must be 5 MB or smaller");
+      return;
+    }
+
+    try {
+      await toast.promise(updateProfileAvatar(file), {
+        loading: "Uploading profile image...",
+        success: "Profile image updated",
+        error: "Profile image upload failed",
+      });
+    } catch {
+      // The cached profile URL remains unchanged when upload fails.
+    }
+  };
 
   const handleLogout = async () => {
     try {
@@ -75,13 +111,13 @@ const ProfileModal: React.FC<ProfileModalProps> = ({
                   User Account
                 </span>
                 <span className="text-[10px] font-semibold text-purple-300 bg-purple-500/20 px-2 py-0.5 rounded-full border border-purple-500/30 uppercase tracking-wider">
-                  {user.role}
+                  {user?.role}
                 </span>
               </div>
               <button
                 type="button"
                 onClick={onClose}
-                disabled={isPending}
+                disabled={isBusy}
                 aria-label="Close profile modal"
                 className="p-1 rounded-lg text-zinc-400 hover:text-white hover:bg-white/5 transition-colors cursor-pointer"
               >
@@ -92,11 +128,11 @@ const ProfileModal: React.FC<ProfileModalProps> = ({
             {/* Profile Hero */}
             <div className="mt-5 flex items-center gap-4">
               <div className="relative">
-                <div className="w-16 h-16 rounded-2xl bg-linear-to-tr from-[#6842ed] to-[#8d6eff] p-0.5 shadow-lg shadow-purple-600/20">
-                  <div className="w-full h-full rounded-[14px] bg-[#1a1b22] flex items-center justify-center overflow-hidden">
-                    {user?.avatar ? (
+                <div className="relative w-16 h-16 rounded-2xl bg-linear-to-tr from-[#6842ed] to-[#8d6eff] p-0.5 shadow-lg shadow-purple-600/20">
+                  <div className="relative w-full h-full rounded-[14px] bg-[#1a1b22] flex items-center justify-center overflow-hidden">
+                    {user?.profileUrl ? (
                       <img
-                        src={user.avatar}
+                        src={user.profileUrl}
                         alt={user.name}
                         className="w-full h-full object-cover"
                         onError={(e) => {
@@ -106,8 +142,35 @@ const ProfileModal: React.FC<ProfileModalProps> = ({
                     ) : (
                       <User size={28} className="text-purple-300" />
                     )}
+                    {isAvatarUploading && (
+                      <div
+                        role="status"
+                        aria-label="Uploading profile image"
+                        className="absolute inset-0 animate-pulse bg-zinc-700/90"
+                      >
+                        <div className="absolute inset-x-3 top-3 h-2 rounded bg-zinc-500/70" />
+                        <div className="absolute inset-x-2 bottom-3 h-2 rounded bg-zinc-500/70" />
+                      </div>
+                    )}
                   </div>
                 </div>
+                <input
+                  ref={avatarInputRef}
+                  type="file"
+                  accept="image/jpeg,image/png,image/webp,image/gif"
+                  onChange={handleAvatarSelected}
+                  className="sr-only"
+                  aria-label="Choose a profile image"
+                />
+                <button
+                  type="button"
+                  onClick={() => avatarInputRef.current?.click()}
+                  disabled={isBusy}
+                  className="mt-2 inline-flex items-center gap-1.5 rounded-lg border border-[#343644] bg-[#1b1c25] px-2.5 py-1.5 text-[11px] font-semibold text-zinc-200 hover:border-purple-500/50 hover:text-white disabled:cursor-not-allowed disabled:opacity-60"
+                >
+                  <ImagePlus size={13} />
+                  {isAvatarUploading ? "Uploading..." : "Update photo"}
+                </button>
                 <div className="absolute -bottom-1 -right-1 w-5 h-5 rounded-full bg-emerald-500 border-2 border-[#14151b] flex items-center justify-center">
                   <CheckCircle2 size={12} className="text-white" />
                 </div>
@@ -115,16 +178,16 @@ const ProfileModal: React.FC<ProfileModalProps> = ({
 
               <div>
                 <h3 className="text-lg font-bold text-white tracking-tight">
-                  {user.name}
+                  {user?.name}
                 </h3>
                 <p className="text-xs text-zinc-400 flex items-center gap-1.5 mt-0.5">
                   <Mail size={12} className="text-zinc-500" />
-                  {user.email}
+                  {user?.email}
                 </p>
                 <div className="flex items-center gap-2 mt-2">
                   <span className="text-[11px] text-zinc-500 font-mono flex items-center gap-1">
                     <Calendar size={11} />
-                    Member since {user.memberSince || "2024"}
+                    Member since {user?.memberSince || "2024"}
                   </span>
                 </div>
               </div>
@@ -158,7 +221,7 @@ const ProfileModal: React.FC<ProfileModalProps> = ({
               <button
                 type="button"
                 onClick={onClose}
-                disabled={isPending}
+                disabled={isBusy}
                 className="flex-1 py-2.5 px-4 rounded-xl bg-[#20222b] hover:bg-[#282a36] text-xs font-semibold text-zinc-200 transition-colors border border-[#2d303e] cursor-pointer"
               >
                 Close
@@ -166,7 +229,7 @@ const ProfileModal: React.FC<ProfileModalProps> = ({
 
               <button
                 type="button"
-                disabled={isPending}
+                disabled={isBusy}
                 onClick={handleLogout}
                 className="flex-1 py-2.5 disabled:cursor-not-allowed px-4 rounded-xl bg-rose-500/10 hover:bg-rose-500/20 border border-rose-500/30 text-rose-300 hover:text-rose-200 text-xs font-semibold flex items-center justify-center gap-2 transition-all cursor-pointer"
               >

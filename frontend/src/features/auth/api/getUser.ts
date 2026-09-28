@@ -1,6 +1,6 @@
 import { api } from "../../../service/api"
 
-interface CurrentUser {
+export interface CurrentUser {
     id: string;
     name: string;
     email: string;

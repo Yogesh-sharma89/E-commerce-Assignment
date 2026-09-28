@@ -92,7 +92,7 @@ export const CreateProduct = asyncHandler(async (req, res) => {
 
     //upload files 
     const uploadRes = await Promise.all(
-        files.map(UploadImage)
+        files.map((file) => UploadImage(file))
     )
 
     //Generate slug 
@@ -216,7 +216,7 @@ export const UpdateProduct = asyncHandler(async (req, res) => {
         }
     }
 
-    const uploadRes = await Promise.all(files.map(UploadImage));
+    const uploadRes = await Promise.all(files.map((file) => UploadImage(file)));
     const previousImageIds = [...replaceImageIds, ...removeImageIds];
 
     replaceImageIds.forEach((publicId, index) => {

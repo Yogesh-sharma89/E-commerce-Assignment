@@ -3,6 +3,7 @@ import registerApi from "../../api/register"
 import loginApi from "../../api/login"
 import logoutApi from "../../api/logout"
 import getUserApi from "../../api/getUser"
+import updateProfileAvatar from "../../api/updateProfileAvatar"
 
 export const useRegisterMutation = () => {
 
@@ -47,7 +48,7 @@ export const useLogoutMutation = () => {
         mutationKey: ['logout'],
         mutationFn: logoutApi,
         onSuccess: () => {
-            queryclient.setQueryData(["user"],null);
+            queryclient.setQueryData(["user"], null);
         }
     })
 }
@@ -58,7 +59,7 @@ export const useGetUser = () => {
     return useQuery({
         queryKey: ['user'],
         queryFn: getUserApi,
-        retry:false,
+        retry: false,
 
         staleTime: 5 * 60 * 1000, // 5 minutes of "fresh" data
         gcTime: 15 * 60 * 1000,   // Keep in cache for 15 minutes if unmounted
@@ -68,3 +69,15 @@ export const useGetUser = () => {
 
     })
 }
+
+export const useUpdateProfileAvatar = () => {
+    const queryClient = useQueryClient();
+
+    return useMutation({
+        mutationKey: ["update-profile-avatar"],
+        mutationFn: updateProfileAvatar,
+        onSuccess: (user) => {
+            queryClient.setQueryData(["user"], user);
+        },
+    });
+};
