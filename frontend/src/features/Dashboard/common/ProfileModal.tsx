@@ -7,7 +7,6 @@ import {
   Shield,
   Calendar,
   LogOut,
-  ExternalLink,
   CheckCircle2,
 } from "lucide-react";
 import { useNavigate } from "react-router";
@@ -17,7 +16,7 @@ import { toast } from "sonner";
 export interface ProfileModalProps {
   isOpen: boolean;
   onClose: () => void;
-  user: any
+  user: any;
 }
 
 const ProfileModal: React.FC<ProfileModalProps> = ({
@@ -27,26 +26,22 @@ const ProfileModal: React.FC<ProfileModalProps> = ({
 }) => {
   const navigate = useNavigate();
 
-  
+  const { mutateAsync: logout, isPending } = useLogoutMutation();
 
-  const {mutateAsync:logout,isPending} = useLogoutMutation();
-
-  const handleLogout = async() => {
-     
-    try{
-        await toast.promise(logout(),{
-            loading:"Logging you out....",
-            success:()=>{
-                onClose();
-                navigate("/login",{replace:true});
-                return "Logout successfully"
-            },
-            error:(err)=> err.response?.data?.message || "Logout failed"
-        }).unwrap()
-
-    }catch(err){
-
-    }
+  const handleLogout = async () => {
+    try {
+      const logoutRequest = logout();
+      toast.promise(logoutRequest, {
+        loading: "Logging you out....",
+        success: () => {
+          onClose();
+          navigate("/login", { replace: true });
+          return "Logout successfully";
+        },
+        error: (err) => err.response?.data?.message || "Logout failed",
+      });
+      await logoutRequest;
+    } catch {}
   };
 
   return (
@@ -97,7 +92,7 @@ const ProfileModal: React.FC<ProfileModalProps> = ({
             {/* Profile Hero */}
             <div className="mt-5 flex items-center gap-4">
               <div className="relative">
-                <div className="w-16 h-16 rounded-2xl bg-linear-to-tr from-[#6842ed] to-[#8d6eff] p-[2px] shadow-lg shadow-purple-600/20">
+                <div className="w-16 h-16 rounded-2xl bg-linear-to-tr from-[#6842ed] to-[#8d6eff] p-0.5 shadow-lg shadow-purple-600/20">
                   <div className="w-full h-full rounded-[14px] bg-[#1a1b22] flex items-center justify-center overflow-hidden">
                     {user?.avatar ? (
                       <img
@@ -185,6 +180,5 @@ const ProfileModal: React.FC<ProfileModalProps> = ({
     </AnimatePresence>
   );
 };
-
 
 export default ProfileModal;

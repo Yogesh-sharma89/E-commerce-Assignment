@@ -9,7 +9,6 @@ import {
   Mail,
   Lock,
   AlertCircle,
-  Check,
 } from 'lucide-react';
 import { Link, useNavigate } from 'react-router';
 
@@ -32,7 +31,6 @@ export function LoginForm({
 }: LoginFormProps) {
 
   const [showPassword, setShowPassword] = useState(false);
-  const [submittedData, setSubmittedData] = useState<LoginFormValues | null>(null);
   const [forgotPasswordNotice, setForgotPasswordNotice] = useState(false);
 
   const {
@@ -84,22 +82,6 @@ export function LoginForm({
       heading="Welcome back"
       subtitle="Sign in to continue to your account."
     >
-      {/* Submission Feedback */}
-      {submittedData && (
-        <motion.div
-          initial={{ opacity: 0, scale: 0.96 }}
-          animate={{ opacity: 1, scale: 1 }}
-          className="mb-5 p-3.5 rounded-lg bg-purple-500/10 border border-purple-500/30 text-purple-200 text-xs flex items-start gap-2.5"
-        >
-          <div className="w-4 h-4 rounded-full bg-purple-500 flex items-center justify-center text-white shrink-0 mt-0.5">
-            <Check className="w-2.5 h-2.5" />
-          </div>
-          <div>
-            <span className="font-semibold text-white">Validation passed!</span> Logged in as{' '}
-            <span className="font-mono text-purple-300">{submittedData.email}</span>. Payload ready for API connection.
-          </div>
-        </motion.div>
-      )}
 
       {/* Forgot Password Notice */}
       {forgotPasswordNotice && (

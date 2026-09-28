@@ -4,7 +4,7 @@ import { verifyToken } from "../utils/token.js";
 import asyncHandler from "./asyncHandler.js";
 
 
-const ProtectRoutes = asyncHandler(async (req, res, next) => {
+const ProtectRoutes = asyncHandler(async (req, _res, next) => {
 
     const accessToken = req.cookies?.accessToken || req.headers.authorization?.split(" ")[1];
 

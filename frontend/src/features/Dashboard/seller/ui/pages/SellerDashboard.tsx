@@ -1,5 +1,5 @@
 import React, { useState, useMemo } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion } from "framer-motion";
 import {
   Plus,
   Search,
@@ -8,7 +8,6 @@ import {
   Trash2,
   Package,
   Layers,
-  CheckCircle2,
   Ban,
   Sparkles,
 } from "lucide-react";
@@ -49,13 +48,6 @@ export const SellerDashboardPage: React.FC = () => {
     useState<Product | null>(null);
 
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
-
-  const [notification, setNotification] = useState<string | null>(null);
-
-  const showNotification = (msg: string) => {
-    setNotification(msg);
-    setTimeout(() => setNotification(null), 3000);
-  };
 
   // Hero Section Metrics
   const metrics = useMemo(() => {
@@ -101,24 +93,20 @@ export const SellerDashboardPage: React.FC = () => {
   const { mutateAsync: updateProduct, isPending: updateProductPending } =
     useUpdateProduct();
 
-    const {mutateAsync:deleteProduct,isPending:deleteProductPending} = useDeleteProduct();
+  const { mutateAsync: deleteProduct, isPending: deleteProductPending } =
+    useDeleteProduct();
 
   // Handler for create
   const handleCreateSubmit = async (values: ProductFormValues) => {
-    try {
-      await toast
-        .promise(createProduct(values), {
-          loading: "Creating Product...",
-          success: () => {
-            return "Product created successfully";
-          },
-          error: (err) =>
-            err.response?.data?.message || "Product creation failed",
-        })
-        .unwrap();
-    } catch (err) {
-      console.log("Error in product creation :", err);
-    }
+    const createRequest = createProduct(values);
+    toast.promise(createRequest, {
+      loading: "Creating Product...",
+      success: () => {
+        return "Product created successfully";
+      },
+      error: (err) => err.response?.data?.message || "Product creation failed",
+    });
+    await createRequest;
   };
 
   // Handler for edit
@@ -130,43 +118,40 @@ export const SellerDashboardPage: React.FC = () => {
 
     const updateValues: ProductUpdateInput = { ...values, ...imageChanges };
 
-    await toast.promise(
-      updateProduct({ productId: editProduct._id, values: updateValues }),
-      {
-        loading: "Updating product...",
-        success: ()=>{
-            setEditProduct(null);
-          return  "Product updated successfully"
-        },
-        error: (err) => err.response?.data?.message || "Product update failed",
+    const updateRequest = updateProduct({
+      productId: editProduct._id,
+      values: updateValues,
+    });
+    toast.promise(updateRequest, {
+      loading: "Updating product...",
+      success: () => {
+        setEditProduct(null);
+        return "Product updated successfully";
       },
-    ).unwrap()
+      error: (err) => err.response?.data?.message || "Product update failed",
+    });
+    await updateRequest;
   };
 
   // Handler for delete
-  const handleDeleteConfirm = async() => {
-
-    if(!deleteTargetProduct){
-        toast.warning("Please select a product to delete");
-        return;
+  const handleDeleteConfirm = async () => {
+    if (!deleteTargetProduct) {
+      toast.warning("Please select a product to delete");
+      return;
     }
-     
+
     const productId = deleteTargetProduct?._id;
 
-    try{
-
-        await toast.promise(deleteProduct({productId}),{
-            loading:"Deleting product...",
-            success:()=>{
-                setDeleteTargetProduct(null);
-                return "Product deleted successfully"
-            },
-            error:(err)=>err.response?.data?.message || "Product deletion failed"
-        }).unwrap()
-
-    }catch(err){
-     console.log("Error in delete product in seller dashboard ",err);
-    }
+    const deleteRequest = deleteProduct({ productId });
+    toast.promise(deleteRequest, {
+      loading: "Deleting product...",
+      success: () => {
+        setDeleteTargetProduct(null);
+        return "Product deleted successfully";
+      },
+      error: (err) => err.response?.data?.message || "Product deletion failed",
+    });
+    await deleteRequest;
   };
 
   if (isPending) {
@@ -177,21 +162,6 @@ export const SellerDashboardPage: React.FC = () => {
     <div className="min-h-screen flex flex-col bg-[#0c0d11] text-zinc-100 selection:bg-purple-500/30 selection:text-purple-200">
       {/* Shared Reusable Navbar in Seller Mode */}
       <AppNavbar role="seller" />
-
-      {/* Floating Action Feedback Notification */}
-      <AnimatePresence>
-        {notification && (
-          <motion.div
-            initial={{ opacity: 0, y: -20, scale: 0.95 }}
-            animate={{ opacity: 1, y: 0, scale: 1 }}
-            exit={{ opacity: 0, y: -20, scale: 0.95 }}
-            className="fixed top-24 right-4 sm:right-8 z-50 px-4 py-3 rounded-xl bg-purple-600/90 text-white text-xs font-semibold shadow-2xl backdrop-blur-md border border-purple-400/40 flex items-center gap-2"
-          >
-            <CheckCircle2 size={16} />
-            <span>{notification}</span>
-          </motion.div>
-        )}
-      </AnimatePresence>
 
       <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-10">
         {/* Hero Section with Metric Grid Boxes */}
@@ -437,7 +407,7 @@ export const SellerDashboardPage: React.FC = () => {
 
                         {/* Price with Currency */}
                         <td className="py-3 px-4">
-                          <span className="font-mono font-bold text-white text-sm text-purple-200">
+                          <span className="font-mono font-bold text-purple-200 text-sm">
                             {formattedPrice}
                           </span>
                           <span className="text-[10px] text-zinc-400 font-mono block">
@@ -562,11 +532,10 @@ export const SellerDashboardPage: React.FC = () => {
 
       {/* 4. Delete Modal */}
       <ProductDeleteModal
-      isPending={deleteProductPending}
+        isPending={deleteProductPending}
         isOpen={Boolean(deleteTargetProduct)}
         onClose={() => setDeleteTargetProduct(null)}
         onConfirm={handleDeleteConfirm}
-
         product={deleteTargetProduct}
       />
     </div>

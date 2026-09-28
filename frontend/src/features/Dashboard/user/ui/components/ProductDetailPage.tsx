@@ -1,6 +1,6 @@
-import React, { useState } from 'react';
-import { useParams, Link, useNavigate } from 'react-router';
-import { motion } from 'framer-motion';
+import React, { useState } from "react";
+import { useParams, Link, useNavigate } from "react-router";
+import { motion } from "framer-motion";
 import {
   ArrowLeft,
   ShieldCheck,
@@ -11,19 +11,17 @@ import {
   Sparkles,
   Ban,
   Layers,
-} from 'lucide-react';
-import { useGetProduct } from '../../../hook/server/useGetproduct';
-import AppNavbar from '../../../common/Navbar';
-import Loader from '../../../../../components/ui/loader';
+} from "lucide-react";
+import { useGetProduct } from "../../../hook/server/useGetproduct";
+import AppNavbar from "../../../common/Navbar";
+import Loader from "../../../../../components/ui/loader";
 
 export const ProductDetailPage: React.FC = () => {
-
-  const { id:productId } = useParams<{ id: string }>();
+  const { id: productId } = useParams<{ id: string }>();
 
   const navigate = useNavigate();
 
-  const {data:product,isLoading} = useGetProduct(productId?.trim()!);
-
+  const { data: product, isLoading } = useGetProduct(productId?.trim());
 
   const [selectedImageIndex, setSelectedImageIndex] = useState(0);
 
@@ -31,10 +29,10 @@ export const ProductDetailPage: React.FC = () => {
 
   const [addedToBag, setAddedToBag] = useState(false);
 
-  if(isLoading){
-    return <Loader label='Preparing your product...'/>
+  if (isLoading) {
+    return <Loader label="Preparing your product..." />;
   }
-  
+
   if (!product) {
     return (
       <div className="min-h-screen flex flex-col bg-[#0c0d11] text-zinc-100">
@@ -47,7 +45,11 @@ export const ProductDetailPage: React.FC = () => {
             Product Not Found
           </h2>
           <p className="text-xs text-zinc-400 max-w-sm mt-1 mb-6">
-            The requested product with identifier <span className="font-mono text-purple-300 font-semibold">{productId}</span> does not exist or has been removed.
+            The requested product with identifier{" "}
+            <span className="font-mono text-purple-300 font-semibold">
+              {productId}
+            </span>{" "}
+            does not exist or has been removed.
           </p>
           <Link
             to="/user"
@@ -62,13 +64,11 @@ export const ProductDetailPage: React.FC = () => {
   }
 
   const currentImage =
-    product.images?.[selectedImageIndex]?.url ||
-    product.images?.[0]?.url ||
-    '';
+    product.images?.[selectedImageIndex]?.url || product.images?.[0]?.url || "";
 
-  const formattedPrice = new Intl.NumberFormat('en-IN', {
-    style: 'currency',
-    currency: product.price?.currency || 'INR',
+  const formattedPrice = new Intl.NumberFormat("en-IN", {
+    style: "currency",
+    currency: product.price?.currency || "INR",
     maximumFractionDigits: 0,
   }).format(product.price?.amount || 0);
 
@@ -77,7 +77,6 @@ export const ProductDetailPage: React.FC = () => {
     setAddedToBag(true);
     setTimeout(() => setAddedToBag(false), 3000);
   };
-
 
   return (
     <div className="min-h-screen flex flex-col bg-[#0c0d11] text-zinc-100 selection:bg-purple-500/30 selection:text-purple-200">
@@ -126,7 +125,9 @@ export const ProductDetailPage: React.FC = () => {
                 Product Currently Not Available
               </h4>
               <p className="text-xs text-rose-300/90 mt-0.5 leading-relaxed">
-                This item is temporarily suspended from active checkout. You can still review technical attributes, dimensions, and release specifications below.
+                This item is temporarily suspended from active checkout. You can
+                still review technical attributes, dimensions, and release
+                specifications below.
               </p>
             </div>
           </motion.div>
@@ -143,10 +144,10 @@ export const ProductDetailPage: React.FC = () => {
                   src={currentImage}
                   alt={product.title}
                   className={`w-full h-full object-contain max-h-115 transition-all duration-300 ${
-                    !product.isActive ? 'filter grayscale contrast-75' : ''
+                    !product.isActive ? "filter grayscale contrast-75" : ""
                   }`}
                   onError={(e) => {
-                    e.currentTarget.style.display = 'none';
+                    e.currentTarget.style.display = "none";
                   }}
                 />
               ) : (
@@ -189,8 +190,8 @@ export const ProductDetailPage: React.FC = () => {
                       onClick={() => setSelectedImageIndex(idx)}
                       className={`relative w-20 h-20 rounded-xl overflow-hidden bg-[#14151b] border-2 transition-all shrink-0 cursor-pointer ${
                         isSelected
-                          ? 'border-[#7c5cfc] ring-2 ring-[#7c5cfc]/30 shadow-md'
-                          : 'border-[#262833] hover:border-zinc-500 opacity-70 hover:opacity-100'
+                          ? "border-[#7c5cfc] ring-2 ring-[#7c5cfc]/30 shadow-md"
+                          : "border-[#262833] hover:border-zinc-500 opacity-70 hover:opacity-100"
                       }`}
                     >
                       <img
@@ -198,7 +199,7 @@ export const ProductDetailPage: React.FC = () => {
                         alt={`${product.title} thumb ${idx + 1}`}
                         className="w-full h-full object-cover"
                         onError={(e) => {
-                          e.currentTarget.style.display = 'none';
+                          e.currentTarget.style.display = "none";
                         }}
                       />
                     </button>
@@ -246,7 +247,9 @@ export const ProductDetailPage: React.FC = () => {
                 </div>
                 <div className="text-right text-[11px] text-zinc-400 font-mono">
                   <span>Inclusive of all taxes</span>
-                  <div className="text-emerald-400 font-medium">Free delivery</div>
+                  <div className="text-emerald-400 font-medium">
+                    Free delivery
+                  </div>
                 </div>
               </div>
 
@@ -325,7 +328,7 @@ export const ProductDetailPage: React.FC = () => {
 
                     <button
                       type="button"
-                      onClick={() => navigate('/user')}
+                      onClick={() => navigate("/user")}
                       className="w-full h-11 rounded-xl bg-[#20212b] hover:bg-[#282a37] text-zinc-200 hover:text-white border border-[#2e313f] text-sm font-semibold transition-all cursor-pointer"
                     >
                       Instant Checkout with ShopFlow Pay
@@ -387,7 +390,8 @@ export const ProductDetailPage: React.FC = () => {
                     100% Authentic & Insured Checkout
                   </span>
                   <span className="text-[11px] text-zinc-400 leading-snug">
-                    Verified supplier batch guarantee with ShopFlow buyer protection.
+                    Verified supplier batch guarantee with ShopFlow buyer
+                    protection.
                   </span>
                 </div>
               </div>

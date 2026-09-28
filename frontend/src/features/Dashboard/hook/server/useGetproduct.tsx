@@ -1,30 +1,30 @@
-import { useQuery } from "@tanstack/react-query"
-import { getAllProductsApi } from "../../api/getAllProducts"
-import { getProductApi } from "../../api/getOneProduct"
+import { useQuery } from "@tanstack/react-query";
+import { getAllProductsApi } from "../../api/getAllProducts";
+import { getProductApi } from "../../api/getOneProduct";
 
-export const useGetAllproducts = ()=>{
-    return useQuery({
-        queryKey:['all-products'],
-        queryFn:getAllProductsApi,
+export const useGetAllproducts = () => {
+  return useQuery({
+    queryKey: ["all-products"],
+    queryFn: getAllProductsApi,
 
-        retry:false,
-        staleTime:10*60*1000,
-        gcTime:15*60*1000,
+    retry: false,
+    staleTime: 10 * 60 * 1000,
+    gcTime: 15 * 60 * 1000,
 
-        refetchOnWindowFocus:false,
-    })
-}
+    refetchOnWindowFocus: false,
+  });
+};
 
-export const useGetProduct  = (productId:string)=>{
+export const useGetProduct = (productId: string | undefined) => {
+  return useQuery({
+    queryKey: ["product", productId],
+    queryFn: () =>
+      productId ? getProductApi(productId) : Promise.resolve(undefined),
+    enabled: !!productId,
+    retry: false,
+    staleTime: 10 * 60 * 1000,
+    gcTime: 15 * 60 * 1000,
 
-    return useQuery({
-        queryKey:['product',productId],
-        queryFn:()=>getProductApi(productId),
-        enabled:!!productId,
-        retry:false,
-        staleTime:10*60*1000,
-        gcTime:15*60*1000,
-
-        refetchOnWindowFocus:false,
-    })
-}
+    refetchOnWindowFocus: false,
+  });
+};

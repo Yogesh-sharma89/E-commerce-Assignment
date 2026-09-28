@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import React, { useState } from "react";
+import { motion, AnimatePresence } from "framer-motion";
 import {
   X,
   Sparkles,
@@ -9,9 +9,8 @@ import {
   Layers,
   Calendar,
   Package,
-} from 'lucide-react';
-import type { Product } from '../../../types/product';
-
+} from "lucide-react";
+import type { Product } from "../../../types/product";
 
 export interface ProductViewModalProps {
   isOpen: boolean;
@@ -24,17 +23,16 @@ export const ProductViewModal: React.FC<ProductViewModalProps> = ({
   onClose,
   product,
 }) => {
-    
   const [selectedImgIndex, setSelectedImgIndex] = useState(0);
 
   if (!product) return null;
 
   const images = product.images || [];
-  const currentImage = images[selectedImgIndex]?.url || images[0]?.url || '';
+  const currentImage = images[selectedImgIndex]?.url || images[0]?.url || "";
 
-  const formattedPrice = new Intl.NumberFormat('en-IN', {
-    style: 'currency',
-    currency: product.price?.currency || 'INR',
+  const formattedPrice = new Intl.NumberFormat("en-IN", {
+    style: "currency",
+    currency: product.price?.currency || "INR",
     maximumFractionDigits: 0,
   }).format(product.price?.amount || 0);
 
@@ -100,7 +98,7 @@ export const ProductViewModal: React.FC<ProductViewModalProps> = ({
                         src={currentImage}
                         alt={product.title}
                         className={`w-full h-full object-contain ${
-                          !product.isActive ? 'filter grayscale' : ''
+                          !product.isActive ? "filter grayscale" : ""
                         }`}
                       />
                     ) : (
@@ -118,8 +116,8 @@ export const ProductViewModal: React.FC<ProductViewModalProps> = ({
                           onClick={() => setSelectedImgIndex(i)}
                           className={`w-14 h-14 rounded-lg overflow-hidden border-2 transition-all shrink-0 cursor-pointer ${
                             selectedImgIndex === i
-                              ? 'border-[#7c5cfc] ring-1 ring-[#7c5cfc]'
-                              : 'border-[#262835] opacity-60 hover:opacity-100'
+                              ? "border-[#7c5cfc] ring-1 ring-[#7c5cfc]"
+                              : "border-[#262835] opacity-60 hover:opacity-100"
                           }`}
                         >
                           <img
@@ -137,7 +135,7 @@ export const ProductViewModal: React.FC<ProductViewModalProps> = ({
                 <div className="space-y-4">
                   <div>
                     <span className="text-[11px] font-semibold text-zinc-400 uppercase tracking-wider block">
-                      {product.category || 'General Merchandise'}
+                      {product.category || "General Merchandise"}
                     </span>
                     <h2 className="text-xl sm:text-2xl font-bold text-white tracking-tight mt-0.5">
                       {product.title}
@@ -153,7 +151,7 @@ export const ProductViewModal: React.FC<ProductViewModalProps> = ({
                       {formattedPrice}
                     </div>
                     <div className="text-[11px] text-zinc-400 mt-1 font-mono">
-                      Currency: {product.price?.currency || 'INR'}
+                      Currency: {product.price?.currency || "INR"}
                     </div>
                   </div>
 
@@ -170,7 +168,12 @@ export const ProductViewModal: React.FC<ProductViewModalProps> = ({
 
                   <div className="text-[11px] text-zinc-400 font-mono flex items-center gap-1.5">
                     <Calendar size={12} className="text-zinc-500" />
-                    <span>Updated: {new Date(product.updatedAt || Date.now()).toLocaleDateString()}</span>
+                    <span>
+                      Updated:{" "}
+                      {product.updatedAt
+                        ? new Date(product.updatedAt).toLocaleDateString()
+                        : "Date unavailable"}
+                    </span>
                   </div>
                 </div>
               </div>

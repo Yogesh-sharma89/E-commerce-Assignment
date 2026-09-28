@@ -201,7 +201,7 @@ export const RefreshSession = asyncHandler(async (req, res) => {
 
     const refreshToken = req.cookies?.refreshToken;
 
-    const validRefreshToken = refreshToken.trim();
+    const validRefreshToken = refreshToken?.trim();
 
     if (!validRefreshToken) {
         throw new AppError(401, "Refresh token is missing", "FAIL");

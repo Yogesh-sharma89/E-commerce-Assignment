@@ -66,7 +66,7 @@ export const ProductFormModal: React.FC<ProductFormModalProps> = ({
         currency: "INR",
       },
       stock: 50,
-      brand:"",
+      brand: "",
       images: [],
       category: "Footwear & Streetwear",
       features: "",
@@ -96,9 +96,10 @@ export const ProductFormModal: React.FC<ProductFormModalProps> = ({
   };
 
   useEffect(() => {
+    const objectUrls = previewUrls.current;
     return () => {
-      previewUrls.current.forEach((url) => URL.revokeObjectURL(url));
-      previewUrls.current.clear();
+      objectUrls.forEach((url) => URL.revokeObjectURL(url));
+      objectUrls.clear();
     };
   }, []);
 
@@ -120,7 +121,7 @@ export const ProductFormModal: React.FC<ProductFormModalProps> = ({
           },
           stock: Number(initialProduct.stock || 0),
           images: [],
-          brand:initialProduct.brand,
+          brand: initialProduct.brand,
           category: initialProduct.category || "",
           features: initialProduct.features || "",
           returnPolicy: initialProduct.returnPolicy || "",
@@ -141,7 +142,7 @@ export const ProductFormModal: React.FC<ProductFormModalProps> = ({
           stock: 25,
           images: [],
           category: "Footwear & Streetwear",
-          brand:"",
+          brand: "",
           features:
             "Ergonomic cushioning, breathable mesh, durable rubber outsole",
           returnPolicy: "7-day easy return and exchange policy",
@@ -275,9 +276,13 @@ export const ProductFormModal: React.FC<ProductFormModalProps> = ({
       });
       return;
     }
-    await onSubmit(data, { replaceImageIds, removeImageIds });
-    reset();
-    onClose();
+    try {
+      await onSubmit(data, { replaceImageIds, removeImageIds });
+      reset();
+      onClose();
+    } catch {
+      // Keep the form values so the user can retry after a failed request.
+    }
   });
 
   return (

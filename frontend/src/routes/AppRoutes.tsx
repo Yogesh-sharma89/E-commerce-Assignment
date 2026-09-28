@@ -1,18 +1,25 @@
 import { lazy, Suspense } from "react";
 import { createBrowserRouter, Navigate, RouterProvider } from "react-router";
 import RoleRoute from "./RoleRoute";
-import UserDashboardPage from "../features/Dashboard/user/ui/pages/UserDashboard";
 import PublicRoute from "./PublicRoutes";
 import ProtectedRoute from "./ProtectedRoutes";
 import Loader from "../components/ui/loader";
-import ProductDetailPage from "../features/Dashboard/user/ui/components/ProductDetailPage";
-import UserLayout from "../features/Dashboard/user/layout/UserLayout";
-import SellerDashboardPage from "../features/Dashboard/seller/ui/pages/SellerDashboard";
 
 //public-routes
 const LoginPage = lazy(() => import("../features/auth/ui/pages/Login"));
 const SignupPage = lazy(() => import("../features/auth/ui/pages/Signup"));
-
+const UserDashboardPage = lazy(
+  () => import("../features/Dashboard/user/ui/pages/UserDashboard"),
+);
+const ProductDetailPage = lazy(
+  () => import("../features/Dashboard/user/ui/components/ProductDetailPage"),
+);
+const UserLayout = lazy(
+  () => import("../features/Dashboard/user/layout/UserLayout"),
+);
+const SellerDashboardPage = lazy(
+  () => import("../features/Dashboard/seller/ui/pages/SellerDashboard"),
+);
 
 const routes = createBrowserRouter([
   {
@@ -48,30 +55,47 @@ const routes = createBrowserRouter([
         children: [
           {
             path: "/user",
-            element: <UserLayout/>,
-            children:[
-                {
-                    index:true,
-                    element:<UserDashboardPage/>
-                },
-                {
-                    path:"products/:id",
-                    element:<ProductDetailPage/>
-                }
-            ]
+            element: (
+              <Suspense fallback={<Loader label="Loading storefront..." />}>
+                <UserLayout />
+              </Suspense>
+            ),
+            children: [
+              {
+                index: true,
+                element: (
+                  <Suspense fallback={<Loader label="Loading products..." />}>
+                    <UserDashboardPage />
+                  </Suspense>
+                ),
+              },
+              {
+                path: "products/:id",
+                element: (
+                  <Suspense fallback={<Loader label="Loading product..." />}>
+                    <ProductDetailPage />
+                  </Suspense>
+                ),
+              },
+            ],
           },
-         
         ],
       },
       {
-        element:<RoleRoute allowed={['seller']}/>,
-        children:[
-            {
-                path:"/seller",
-                element:<SellerDashboardPage/>
-            }
-        ]
-      }
+        element: <RoleRoute allowed={["seller"]} />,
+        children: [
+          {
+            path: "/seller",
+            element: (
+              <Suspense
+                fallback={<Loader label="Loading seller dashboard..." />}
+              >
+                <SellerDashboardPage />
+              </Suspense>
+            ),
+          },
+        ],
+      },
     ],
   },
 ]);

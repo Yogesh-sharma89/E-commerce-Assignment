@@ -1,19 +1,19 @@
-import React from 'react';
-import { Link, useLocation } from 'react-router';
-import { Layers } from 'lucide-react';
-import { motion } from 'framer-motion';
-import { AuthBrandPanel } from '../ui/components/AuthBrandPanel';
+import React from "react";
+import { Link, useLocation } from "react-router";
+import { Layers } from "lucide-react";
+import { motion } from "framer-motion";
+import { AuthBrandPanel } from "../ui/components/AuthBrandPanel";
 
+const COPYRIGHT_YEAR = new Date().getFullYear();
 
 interface AuthLayoutProps {
   children: React.ReactNode;
 }
 
 export const AuthLayout: React.FC<AuthLayoutProps> = ({ children }) => {
-    
   const location = useLocation();
-  const isLogin = location.pathname === '/login' || location.pathname === '/';
-  const isSignup = location.pathname === '/signup';
+  const isLogin = location.pathname === "/login" || location.pathname === "/";
+  const isSignup = location.pathname === "/signup";
 
   return (
     <div className="min-h-screen flex flex-col bg-[#0c0d11] text-zinc-100 selection:bg-purple-500/30 selection:text-purple-200 relative overflow-hidden">
@@ -43,8 +43,8 @@ export const AuthLayout: React.FC<AuthLayoutProps> = ({ children }) => {
             to="/login"
             className={`text-sm font-medium transition-all px-4 py-1.5 rounded-lg ${
               isLogin
-                ? 'bg-[#7c5cfc] text-white shadow-[0_2px_12px_rgba(124,92,252,0.35)]'
-                : 'text-zinc-400 hover:text-zinc-200 hover:bg-white/5'
+                ? "bg-[#7c5cfc] text-white shadow-[0_2px_12px_rgba(124,92,252,0.35)]"
+                : "text-zinc-400 hover:text-zinc-200 hover:bg-white/5"
             }`}
           >
             Sign In
@@ -53,8 +53,8 @@ export const AuthLayout: React.FC<AuthLayoutProps> = ({ children }) => {
             to="/signup"
             className={`text-sm font-medium transition-all px-4 py-1.5 rounded-lg ${
               isSignup
-                ? 'bg-[#7c5cfc] text-white shadow-[0_2px_12px_rgba(124,92,252,0.35)]'
-                : 'text-zinc-400 hover:text-zinc-200 hover:bg-white/5'
+                ? "bg-[#7c5cfc] text-white shadow-[0_2px_12px_rgba(124,92,252,0.35)]"
+                : "text-zinc-400 hover:text-zinc-200 hover:bg-white/5"
             }`}
           >
             Register
@@ -78,18 +78,14 @@ export const AuthLayout: React.FC<AuthLayoutProps> = ({ children }) => {
             </div>
 
             {/* Right Column: Dynamic Form (Login or Signup) */}
-            <div className="flex flex-col justify-center">
-              {children}
-            </div>
+            <div className="flex flex-col justify-center">{children}</div>
           </div>
         </motion.div>
       </main>
 
       {/* Subdued Footer Trust Note */}
       <footer className="relative z-10 py-4 text-center text-xs text-zinc-500 font-normal">
-        <p>
-          ShopFlow Platform Infrastructure {new Date(Date.now()).getFullYear()} &copy;
-        </p>
+        <p>ShopFlow Platform Infrastructure {COPYRIGHT_YEAR} &copy;</p>
       </footer>
     </div>
   );

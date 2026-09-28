@@ -9,7 +9,6 @@ import {
   Lock,
   User,
   AlertCircle,
-  Check,
   StoreIcon,
 } from "lucide-react";
 import { Link, useNavigate } from "react-router";
@@ -30,12 +29,9 @@ export interface SignupFormProps {
   onGoogleSignIn?: () => void;
 }
 
-export function SignupForm({ onSubmit, onGoogleSignIn }: SignupFormProps) {
+export function SignupForm({ onGoogleSignIn }: SignupFormProps) {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-  const [submittedData, setSubmittedData] = useState<RegisterFormValues | null>(
-    null,
-  );
 
   const {
     register,
@@ -65,7 +61,13 @@ export function SignupForm({ onSubmit, onGoogleSignIn }: SignupFormProps) {
   const submitHandler = handleSubmit(async (values) => {
     const { email, password, fullname, role } = values;
     try {
-      toast.promise(registerMutation({ email, password, fullname, role }), {
+      const registerRequest = registerMutation({
+        email,
+        password,
+        fullname,
+        role,
+      });
+      toast.promise(registerRequest, {
         loading: "Creating you account...",
         success: (user) => {
           reset();
@@ -77,6 +79,7 @@ export function SignupForm({ onSubmit, onGoogleSignIn }: SignupFormProps) {
         error: (err) =>
           err.response?.data?.message || "Account creation failed",
       });
+      await registerRequest;
     } catch (err) {
       console.log("Error in signup form :", err);
     }
@@ -87,27 +90,6 @@ export function SignupForm({ onSubmit, onGoogleSignIn }: SignupFormProps) {
       heading="Create your account"
       subtitle="Sign up to get started with ShopFlow."
     >
-      {/* Submission Feedback */}
-      {submittedData && (
-        <motion.div
-          initial={{ opacity: 0, scale: 0.96 }}
-          animate={{ opacity: 1, scale: 1 }}
-          className="mb-5 p-3.5 rounded-lg bg-purple-500/10 border border-purple-500/30 text-purple-200 text-xs flex items-start gap-2.5"
-        >
-          <div className="w-4 h-4 rounded-full bg-purple-500 flex items-center justify-center text-white shrink-0 mt-0.5">
-            <Check className="w-2.5 h-2.5" />
-          </div>
-          <div>
-            <span className="font-semibold text-white">Account validated!</span>{" "}
-            Signed up as{" "}
-            <span className="font-mono text-purple-300">
-              {submittedData.fullname}
-            </span>{" "}
-            ({submittedData.email}). Payload ready for API connection.
-          </div>
-        </motion.div>
-      )}
-
       {/* Form */}
       <form onSubmit={submitHandler} noValidate className="space-y-3.5">
         <div>

@@ -11,18 +11,28 @@ import path from "path";
 import EnvConfig from "./config/env.config.js";
 
 
-const  _filename  = fileURLToPath(import.meta.url) ;
+const _filename = fileURLToPath(import.meta.url);
 const _dirname = path.dirname(_filename);
 
 const app = express();
 
 
-app.use(helmet());
+app.use(helmet({
+  contentSecurityPolicy: {
+    directives: {
+      imgSrc: [
+        "'self'",
+        "data:",
+        "https://ik.imagekit.io",
+      ]
+    }
+  }
+}));
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-if(EnvConfig.environment!=='production'){
+if (EnvConfig.environment !== 'production') {
   app.use(
     cors({
       origin: "http://localhost:5173",
@@ -40,8 +50,8 @@ app.use(httpLogger);
 
 
 //routes 
-app.use("/api/auth",authRouter);
-app.use("/api/products",productRouter);
+app.use("/api/auth", authRouter);
+app.use("/api/products", productRouter);
 
 
 app.get("/api/health", (_req, res) => {
@@ -52,22 +62,22 @@ app.get("/api/health", (_req, res) => {
 });
 
 //Fronted server 
-const frontendPath = path.resolve(_dirname,"../../frontend/dist")
+const frontendPath = path.resolve(_dirname, "../../frontend/dist")
 
 app.use(express.static(frontendPath));
 
 
-app.use((req,res,next)=>{
+app.use((req, res, next) => {
 
-  if(req.method!=="GET"){
-     return next();
-  }
-
-  if(req.path.startsWith("/api")){
+  if (req.method !== "GET") {
     return next();
   }
 
-  res.sendFile(path.join(frontendPath,"index.html"))
+  if (req.path.startsWith("/api")) {
+    return next();
+  }
+
+  res.sendFile(path.join(frontendPath, "index.html"))
 })
 
 

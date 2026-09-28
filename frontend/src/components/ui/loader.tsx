@@ -12,7 +12,7 @@ export default function Loader({
       role="status"
       aria-live="polite"
       className="
-        fixed inset-0 z-[9999]
+        fixed inset-0 z-9999
         flex items-center justify-center
         overflow-hidden
         bg-bg-base
@@ -41,7 +41,7 @@ export default function Loader({
           {/* Outer rotating ring */}
           <div
             className="
-              absolute inset-[-10px]
+              absolute -inset-2.5
               rounded-full
               border border-transparent
               border-t-accent
@@ -54,7 +54,7 @@ export default function Loader({
           {/* Second subtle ring */}
           <div
             className="
-              absolute inset-[-4px]
+              absolute -inset-1
               rounded-full
               border border-accent/10
               animate-loader-spin-reverse
@@ -69,7 +69,7 @@ export default function Loader({
               flex h-16 w-16
               items-center justify-center
               rounded-2xl
-              border border-white/[0.08]
+              border border-white/8
               bg-bg-elevated
               shadow-[0_0_50px_rgba(139,124,255,0.15)]
               animate-loader-breathe
@@ -121,10 +121,7 @@ export default function Loader({
         </div>
 
         {/* Loading dots */}
-        <div
-          className="mb-4 flex items-center gap-2"
-          aria-hidden="true"
-        >
+        <div className="mb-4 flex items-center gap-2" aria-hidden="true">
           <span
             className="
               h-1.5 w-1.5
@@ -180,7 +177,7 @@ export default function Loader({
             w-24
             overflow-hidden
             rounded-full
-            bg-white/[0.06]
+            bg-white/6
           "
           aria-hidden="true"
         >

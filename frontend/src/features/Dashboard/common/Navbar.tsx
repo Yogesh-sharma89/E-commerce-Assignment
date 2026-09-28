@@ -1,6 +1,6 @@
-import React, { useState, useRef, useEffect } from 'react';
-import { Link, useLocation, useNavigate } from 'react-router';
-import { motion, AnimatePresence } from 'framer-motion';
+import React, { useState, useRef, useEffect } from "react";
+import { Link, useLocation, useNavigate } from "react-router";
+import { motion, AnimatePresence } from "framer-motion";
 import {
   Layers,
   User,
@@ -10,65 +10,91 @@ import {
   ChevronDown,
   ShoppingBag,
   ShieldCheck,
-} from 'lucide-react';
+} from "lucide-react";
 
-import { useGetUser, useLogoutMutation } from '../../auth/hooks/server/useAuth.ts';
-import ProfileModal from './ProfileModal.tsx';
-import { toast } from 'sonner';
+import {
+  useGetUser,
+  useLogoutMutation,
+} from "../../auth/hooks/server/useAuth.ts";
+import ProfileModal from "./ProfileModal.tsx";
+import { toast } from "sonner";
 
 export interface AppNavbarProps {
-  role?: 'user' | 'seller';
+  role?: "user" | "seller";
 }
 
-export const AppNavbar: React.FC<AppNavbarProps> = ({ role = 'user' }) => {
+export const AppNavbar: React.FC<AppNavbarProps> = ({ role = "user" }) => {
+  const { data: currentUser } = useGetUser();
 
-    const {data:currentUser} = useGetUser();
-    
   const location = useLocation();
   const navigate = useNavigate();
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const [profileDropdownOpen, setProfileDropdownOpen] = useState(false);
+  const [menuState, setMenuState] = useState(() => ({
+    pathname: location.pathname,
+    mobileOpen: false,
+    profileOpen: false,
+  }));
   const [profileModalOpen, setProfileModalOpen] = useState(false);
 
   const dropdownRef = useRef<HTMLDivElement>(null);
 
-  const isSeller = role === 'seller' || location.pathname.startsWith('/seller');
+  const isSeller = role === "seller" || location.pathname.startsWith("/seller");
+  const isCurrentPath = menuState.pathname === location.pathname;
+  const mobileMenuOpen = isCurrentPath && menuState.mobileOpen;
+  const profileDropdownOpen = isCurrentPath && menuState.profileOpen;
+
+  const setMobileMenuOpen = (open: boolean) => {
+    setMenuState((current) => ({
+      pathname: location.pathname,
+      mobileOpen: current.pathname === location.pathname ? open : false,
+      profileOpen:
+        current.pathname === location.pathname ? current.profileOpen : false,
+    }));
+  };
+
+  const setProfileDropdownOpen = (open: boolean) => {
+    setMenuState((current) => ({
+      pathname: location.pathname,
+      mobileOpen:
+        current.pathname === location.pathname ? current.mobileOpen : false,
+      profileOpen: current.pathname === location.pathname ? open : false,
+    }));
+  };
 
   // Close dropdown on outside click
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
-      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
-        setProfileDropdownOpen(false);
+      if (
+        dropdownRef.current &&
+        !dropdownRef.current.contains(event.target as Node)
+      ) {
+        setMenuState((current) => ({
+          pathname: location.pathname,
+          mobileOpen:
+            current.pathname === location.pathname ? current.mobileOpen : false,
+          profileOpen: false,
+        }));
       }
     }
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => document.removeEventListener('mousedown', handleClickOutside);
-  }, []);
-
-  // Close mobile menu on route change
-  useEffect(() => {
-    setMobileMenuOpen(false);
-    setProfileDropdownOpen(false);
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
   }, [location.pathname]);
 
-  const {mutateAsync:logout,isPending} = useLogoutMutation();
+  const { mutateAsync: logout, isPending } = useLogoutMutation();
 
-  const handleLogout = async() => {
-     
-    try{
-        await toast.promise(logout(),{
-            loading:"Logging you out....",
-            success:()=>{
-                setProfileDropdownOpen(false);
-                navigate("/login",{replace:true});
-                return "Logout successfully"
-            },
-            error:(err)=> err.response?.data?.message || "Logout failed"
-        }).unwrap()
-
-    }catch(err){
-
-    }
+  const handleLogout = async () => {
+    try {
+      const logoutRequest = logout();
+      toast.promise(logoutRequest, {
+        loading: "Logging you out....",
+        success: () => {
+          setProfileDropdownOpen(false);
+          navigate("/login", { replace: true });
+          return "Logout successfully";
+        },
+        error: (err) => err.response?.data?.message || "Logout failed",
+      });
+      await logoutRequest;
+    } catch {}
   };
 
   return (
@@ -77,7 +103,7 @@ export const AppNavbar: React.FC<AppNavbarProps> = ({ role = 'user' }) => {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 sm:h-20 flex items-center justify-between">
           {/* Left: Brand Logo only */}
           <Link
-            to={isSeller ? '/seller' : '/user'}
+            to={isSeller ? "/seller" : "/user"}
             className="flex items-center gap-2.5 group transition-transform active:scale-95"
             aria-label="ShopFlow Home"
           >
@@ -91,15 +117,14 @@ export const AppNavbar: React.FC<AppNavbarProps> = ({ role = 'user' }) => {
               <span
                 className={`text-[10px] font-semibold font-mono px-2 py-0.5 rounded-full border uppercase tracking-wider ${
                   isSeller
-                    ? 'text-purple-300 bg-purple-500/15 border-purple-500/30'
-                    : 'text-zinc-400 bg-white/5 border-white/10'
+                    ? "text-purple-300 bg-purple-500/15 border-purple-500/30"
+                    : "text-zinc-400 bg-white/5 border-white/10"
                 }`}
               >
-                {isSeller ? 'SELLER HUB' : 'STORE'}
+                {isSeller ? "SELLER HUB" : "STORE"}
               </span>
             </div>
           </Link>
-
 
           {/* Right Side: Profile icon with username & modal opener */}
           <div className="flex items-center gap-3">
@@ -118,7 +143,7 @@ export const AppNavbar: React.FC<AppNavbarProps> = ({ role = 'user' }) => {
                 type="button"
                 whileHover={{ scale: 1.02 }}
                 whileTap={{ scale: 0.98 }}
-                onClick={() => setProfileDropdownOpen((prev) => !prev)}
+                onClick={() => setProfileDropdownOpen(!profileDropdownOpen)}
                 aria-expanded={profileDropdownOpen}
                 aria-label="User profile menu"
                 className="flex items-center gap-2.5 pl-2 pr-3 py-1.5 rounded-xl bg-[#16171f] hover:bg-[#1e1f2a] border border-[#272935] hover:border-[#373949] transition-all cursor-pointer shadow-sm"
@@ -131,7 +156,7 @@ export const AppNavbar: React.FC<AppNavbarProps> = ({ role = 'user' }) => {
                       alt={currentUser?.name}
                       className="w-full h-full rounded-md object-cover"
                       onError={(e) => {
-                        e.currentTarget.style.display = 'none';
+                        e.currentTarget.style.display = "none";
                       }}
                     />
                   </div>
@@ -144,14 +169,14 @@ export const AppNavbar: React.FC<AppNavbarProps> = ({ role = 'user' }) => {
                     {currentUser?.name}
                   </span>
                   <span className="text-[10px] text-zinc-400 font-mono block leading-tight">
-                    {isSeller ? 'Seller Mode' : 'Buyer Account'}
+                    {isSeller ? "Seller Mode" : "Buyer Account"}
                   </span>
                 </div>
 
                 <ChevronDown
                   size={14}
                   className={`text-zinc-400 transition-transform duration-200 ${
-                    profileDropdownOpen ? 'rotate-180 text-purple-300' : ''
+                    profileDropdownOpen ? "rotate-180 text-purple-300" : ""
                   }`}
                 />
               </motion.button>
@@ -163,7 +188,7 @@ export const AppNavbar: React.FC<AppNavbarProps> = ({ role = 'user' }) => {
                     initial={{ opacity: 0, y: 8, scale: 0.96 }}
                     animate={{ opacity: 1, y: 0, scale: 1 }}
                     exit={{ opacity: 0, y: 8, scale: 0.96 }}
-                    transition={{ duration: 0.18, ease: 'easeOut' }}
+                    transition={{ duration: 0.18, ease: "easeOut" }}
                     className="absolute right-0 mt-2 w-56 rounded-2xl bg-[#14151b] border border-[#262835] shadow-[0_16px_40px_rgba(0,0,0,0.7),0_0_20px_rgba(124,92,252,0.15)] py-2 z-50 overflow-hidden"
                   >
                     {/* User header in dropdown */}
@@ -189,7 +214,6 @@ export const AppNavbar: React.FC<AppNavbarProps> = ({ role = 'user' }) => {
                         <User size={15} className="text-purple-400" />
                         <span>View Profile</span>
                       </button>
-
 
                       <button
                         type="button"
@@ -223,7 +247,7 @@ export const AppNavbar: React.FC<AppNavbarProps> = ({ role = 'user' }) => {
             {/* Mobile Hamburger Menu Toggle */}
             <button
               type="button"
-              onClick={() => setMobileMenuOpen((prev) => !prev)}
+              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
               aria-label="Toggle navigation menu"
               className="p-2 rounded-xl text-zinc-300 hover:text-white hover:bg-white/5 md:hidden transition-colors border border-[#272935] cursor-pointer"
             >
@@ -237,9 +261,9 @@ export const AppNavbar: React.FC<AppNavbarProps> = ({ role = 'user' }) => {
           {mobileMenuOpen && (
             <motion.div
               initial={{ height: 0, opacity: 0 }}
-              animate={{ height: 'auto', opacity: 1 }}
+              animate={{ height: "auto", opacity: 1 }}
               exit={{ height: 0, opacity: 0 }}
-              transition={{ duration: 0.25, ease: 'easeInOut' }}
+              transition={{ duration: 0.25, ease: "easeInOut" }}
               className="md:hidden border-t border-[#20222a] bg-[#111217] px-4 pt-3 pb-6 overflow-hidden space-y-3"
             >
               {/* User overview card on mobile */}
@@ -251,7 +275,7 @@ export const AppNavbar: React.FC<AppNavbarProps> = ({ role = 'user' }) => {
                       alt={currentUser?.name}
                       className="w-full h-full rounded-md object-cover"
                       onError={(e) => {
-                        e.currentTarget.style.display = 'none';
+                        e.currentTarget.style.display = "none";
                       }}
                     />
                   </div>
@@ -260,7 +284,7 @@ export const AppNavbar: React.FC<AppNavbarProps> = ({ role = 'user' }) => {
                       {currentUser?.name}
                     </span>
                     <span className="text-[11px] text-zinc-400 block font-mono">
-                      {isSeller ? 'Seller Account' : 'Buyer Account'}
+                      {isSeller ? "Seller Account" : "Buyer Account"}
                     </span>
                   </div>
                 </div>

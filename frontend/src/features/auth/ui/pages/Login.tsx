@@ -5,12 +5,6 @@ import LoginForm from "../components/LoginForm";
 
 const LoginPage = () => {
 
-
-
-  const handleGoogleSignIn = () => {
-    // Kick off your OAuth flow here
-    console.log("continue with Google");
-  };
    
   return(
     
